@@ -2,7 +2,7 @@
 
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"d3d11.lib")
-#pragma comment(lib,"d3dx11,lib")
+#pragma comment(lib,"d3dx11.lib")
 #pragma comment(lib,"d3dx10.lib")
 
 #include<dxgi.h>
@@ -33,14 +33,14 @@ public:
 	void					GetVideoCardInfo(char*, int&);
 
 private:
-	bool					m_vsync_enabled; //是否启用垂直同步
-	int						m_videoCardMemory; //显存大小
-	char					m_videoCardDescription[128]; //显卡名字
-	IDXGISwapChain*			m_swapChain; //交换链对象
-	ID3D11Device*			m_device;  //设备对象
-	ID3D11DeviceContext*	m_deviceContext; //设备上下文对象
-	ID3D11RenderTargetView* m_renderTargetView; //渲染目标视图
-	ID3D11Texture2D*		m_depthStencilBuffer;
+	bool					 m_vsync_enabled; //是否启用垂直同步
+	int						 m_videoCardMemory; //显存大小
+	char					 m_videoCardDescription[128]; //显卡名字
+	IDXGISwapChain*			 m_swapChain; //交换链对象
+	ID3D11Device*			 m_device;  //设备对象
+	ID3D11DeviceContext*	 m_deviceContext; //设备上下文对象
+	ID3D11RenderTargetView*  m_renderTargetView; //渲染目标视图
+	ID3D11Texture2D*		 m_depthStencilBuffer;
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView*	 m_depthStencilView; //深度目标视图
 	ID3D11RasterizerState*	 m_rasterState; //渲染状态
