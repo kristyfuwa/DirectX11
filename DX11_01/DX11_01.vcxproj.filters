@@ -18,31 +18,42 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SystemClass.cpp">
+    <ClCompile Include="D3D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="InputClass.cpp">
+    <ClCompile Include="Graphics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsClass.cpp">
+    <ClCompile Include="Input.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="D3DClass.cpp">
+    <ClCompile Include="EngineManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SystemClass.h">
+    <ClInclude Include="Input.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="InputClass.h">
+    <ClInclude Include="Graphics.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsClass.h">
+    <ClInclude Include="D3D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="D3DClass.h">
+    <ClInclude Include="EngineManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="color.fx">
+      <Filter>头文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

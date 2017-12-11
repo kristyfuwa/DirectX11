@@ -1,6 +1,8 @@
 #pragma once
 #include <windows.h>
 
+#include "D3D.h"
+
 /////////////
 // GLOBALS //
 /////////////
@@ -11,12 +13,12 @@ const float SCREEN_DEPTH = 1000.0f; //深度，远点
 const float SCREEN_NEAR = 0.1f; //深度，近点
 
 
-class GraphicsClass
+class Graphics
 {
 public:
-	GraphicsClass();
-	GraphicsClass(const GraphicsClass&);
-	~GraphicsClass();
+	Graphics();
+	Graphics(const Graphics&);
+	~Graphics();
 
 	bool	Initialize(int ,int,HWND);
 	void	Shutdown();
@@ -24,5 +26,8 @@ public:
 
 private:
 	bool	Render();
+
+	//定义一个D3D类成员变量
+	D3D*	m_pD3D;
 };
 

@@ -1,11 +1,11 @@
-#include "SystemClass.h"
+#include "EngineManager.h"
 
 int	WINAPI	WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	SystemClass* pSystem;
+	EngineManager* pSystem;
 	bool result;
 
-	pSystem = new SystemClass;
+	pSystem = new EngineManager;
 	if (!pSystem)
 	{
 		return 0;

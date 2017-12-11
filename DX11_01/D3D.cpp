@@ -1,6 +1,6 @@
-#include "D3DClass.h"
+#include "D3D.h"
 
-D3DClass::D3DClass()
+D3D::D3D()
 {
 	m_swapChain = 0;
 	m_device = 0;
@@ -13,13 +13,13 @@ D3DClass::D3DClass()
 }
 
 
-D3DClass::~D3DClass()
+D3D::~D3D()
 {
 
 }
 
 //Initialize函数包含完成D3D设置的所有代码。
-bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen,
+bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen,
 	float screenDepth, float screenNear)
 {
 	HRESULT result;
@@ -305,7 +305,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	return true;
 }
 
-void D3DClass::Shutdown()
+void D3D::Shutdown()
 {
 	// 释放交换链资源前，先设置为窗口模式，否则可能会产生异常.
 	if (m_swapChain)
@@ -364,7 +364,7 @@ void D3DClass::Shutdown()
 	return;
 }
 
-void D3DClass::BeginScene(float red, float green, float blue, float alpha)
+void D3D::BeginScene(float red, float green, float blue, float alpha)
 {
 	float color[4];
 	// 设置清除后缓冲颜色.
@@ -378,7 +378,7 @@ void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 	return;
 }
 
-void D3DClass::EndScene()
+void D3D::EndScene()
 {
 	//渲染完成后，把后缓冲内容present到前缓冲
 	if (m_vsync_enabled)
@@ -394,38 +394,38 @@ void D3DClass::EndScene()
 	return;
 }
 
-ID3D11Device* D3DClass::GetDevice()
+ID3D11Device* D3D::GetDevice()
 {
 	return m_device;
 }
 
 
-ID3D11DeviceContext* D3DClass::GetDeviceContext()
+ID3D11DeviceContext* D3D::GetDeviceContext()
 {
 	return m_deviceContext;
 }
 
-void D3DClass::GetProjectionMatrix(XMMATRIX& projectionMatrix)
+void D3D::GetProjectionMatrix(XMMATRIX& projectionMatrix)
 {
 	projectionMatrix = m_projectionMatrix;
 	return;
 }
 
 
-void D3DClass::GetWorldMatrix(XMMATRIX& worldMatrix)
+void D3D::GetWorldMatrix(XMMATRIX& worldMatrix)
 {
 	worldMatrix = m_worldMatrix;
 	return;
 }
 
 
-void D3DClass::GetOrthoMatrix(XMMATRIX& orthoMatrix)
+void D3D::GetOrthoMatrix(XMMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
 	return;
 }
 
-void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
+void D3D::GetVideoCardInfo(char* cardName, int& memory)
 {
 	strcpy_s(cardName, 128, m_videoCardDescription);
 	memory = m_videoCardMemory;

@@ -1,35 +1,35 @@
-#include "SystemClass.h"
+#include "EngineManager.h"
 
 
 
-SystemClass::SystemClass()
+EngineManager::EngineManager()
 {
 	m_pInput = 0;
 	m_pGraphics = 0;
 }
 
 
-SystemClass::SystemClass(const SystemClass&)
+EngineManager::EngineManager(const EngineManager&)
 {
 
 }
 
-SystemClass::~SystemClass()
+EngineManager::~EngineManager()
 {
 }
 
-bool SystemClass::Initialize()
+bool EngineManager::Initialize()
 {
 	int screenWidth = 0, screenHeight = 0;
 	int result;
 	InitializeWindows(screenWidth, screenHeight);
 
-	m_pInput = new InputClass;
+	m_pInput = new Input;
 	if (!m_pInput)
 		return false;
 	m_pInput->Initialize();
 
-	m_pGraphics = new GraphicsClass;
+	m_pGraphics = new Graphics;
 	if (!m_pGraphics)
 		return false;
 	result = m_pGraphics->Initialize(screenWidth, screenHeight, m_hWnd);
@@ -39,7 +39,7 @@ bool SystemClass::Initialize()
 	return true;
 }
 
-void SystemClass::Shutdown()
+void EngineManager::Shutdown()
 {
 	if (m_pGraphics)
 	{
@@ -56,7 +56,7 @@ void SystemClass::Shutdown()
 	ShutdownWindows();
 }
 
-void SystemClass::Run()
+void EngineManager::Run()
 {
 	MSG msg;
 	bool done, result = 1;
@@ -88,7 +88,7 @@ void SystemClass::Run()
 	return;
 }
 
-bool SystemClass::Frame()
+bool EngineManager::Frame()
 {
 	bool result;
 	if (m_pInput->IsKeyDown(VK_ESCAPE))
@@ -105,7 +105,7 @@ bool SystemClass::Frame()
 	return true;
 }
 
-void SystemClass::InitializeWindows(int& screenWidth, int & screenHeight)
+void EngineManager::InitializeWindows(int& screenWidth, int & screenHeight)
 {
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
@@ -192,7 +192,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int & screenHeight)
 	//ShowCursor(false);
 }
 
-void SystemClass::ShutdownWindows()
+void EngineManager::ShutdownWindows()
 {
 	//œ‘ æπ‚±Í.
 	//ShowCursor(true);
@@ -215,7 +215,7 @@ void SystemClass::ShutdownWindows()
 	return;
 }
 
-LRESULT	CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT	CALLBACK EngineManager::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	switch (umsg)
 	{
