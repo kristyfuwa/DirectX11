@@ -33,6 +33,12 @@
     <ClCompile Include="Model.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorShader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input.h">
@@ -50,10 +56,14 @@
     <ClInclude Include="Model.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorShader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="color.fx">
-      <Filter>头文件</Filter>
-    </Text>
+    <None Include="color.hlsl" />
   </ItemGroup>
 </Project>

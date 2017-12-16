@@ -65,7 +65,23 @@ void Model::Render(ID3D11DeviceContext* deviceContext)
 
 void Model::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
+	unsigned int stride;
+	unsigned int offset;
 
+	// 设置顶点缓冲跨度和偏移.
+	stride = sizeof(VertexType);
+	offset = 0;
+
+	//在input assemberl阶段绑定顶点缓冲，以便能够被渲染
+	deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+
+	////在input assemberl阶段绑定索引缓冲，以便能够被渲染
+	deviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// 设置体元语义，渲染三角形列表
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return;
 }
 
 bool Model::InitializeBuffers(ID3D11Device* device)

@@ -150,6 +150,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ColorShader.cpp" />
     <ClCompile Include="D3D.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -158,6 +160,8 @@
     <ClCompile Include="Model.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ColorShader.h" />
     <ClInclude Include="D3D.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
@@ -166,7 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="color.hlsl">
-      <FileType>Text</FileType>
+      <FileType>HLSL</FileType>
     </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
