@@ -64,6 +64,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.hlsl" />
+    <FxCompile Include="color.fx" />
   </ItemGroup>
 </Project>
