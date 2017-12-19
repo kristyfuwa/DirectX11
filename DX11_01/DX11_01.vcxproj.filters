@@ -64,6 +64,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="color.fx" />
+    <None Include="color.ps">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="color.vs">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

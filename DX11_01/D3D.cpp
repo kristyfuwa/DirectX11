@@ -167,7 +167,8 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	// 如果显卡不支持D3D11,我们能够通过设置这个参数，使用D3D10,或者9.
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
-		D3D11_SDK_LAYERS_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL,&m_deviceContext);
+		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL,&m_deviceContext);
+
 
 	if (FAILED(result))
 		return false;
@@ -289,18 +290,19 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	// 创建视口
 	m_deviceContext->RSSetViewports(1, &viewport);
 	// 设置透视投影矩阵
-	fieldOfView = (float)XM_PI / 4.0f;
+	fieldOfView = (float)D3DX_PI / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// 创建透视投影矩阵.
-	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
-
+	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
+	
 	//初始化world矩阵为单位矩阵.
 	//该矩阵实现局部坐标到世界坐标的转换
-	m_worldMatrix = XMMatrixIdentity();
+	D3DXMatrixIdentity(&m_worldMatrix);
 
 	// 创建正交投影矩阵，主要用来实施2D渲染.
-	m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+
+	D3DXMatrixOrthoLH(&m_orthoMatrix, (float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
 }
@@ -405,21 +407,21 @@ ID3D11DeviceContext* D3D::GetDeviceContext()
 	return m_deviceContext;
 }
 
-void D3D::GetProjectionMatrix(XMMATRIX& projectionMatrix)
+void D3D::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
 {
 	projectionMatrix = m_projectionMatrix;
 	return;
 }
 
 
-void D3D::GetWorldMatrix(XMMATRIX& worldMatrix)
+void D3D::GetWorldMatrix(D3DXMATRIX& worldMatrix)
 {
 	worldMatrix = m_worldMatrix;
 	return;
 }
 
 
-void D3D::GetOrthoMatrix(XMMATRIX& orthoMatrix)
+void D3D::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
 	return;

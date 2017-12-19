@@ -2,6 +2,7 @@
 
 
 
+
 ColorShader::ColorShader()
 {
 	m_pLayout = 0;
@@ -24,7 +25,7 @@ bool ColorShader::Initialize(ID3D11Device* device, HWND hwnd)
 {
 	bool result;
 	//初始化vs,ps
-	result = InitializeShader(device, hwnd, L"color.fx", L"color.fx");
+	result = InitializeShader(device, hwnd, L"color.vs", L"color.ps");
 	if (!result)
 		return false;
 	return true;
@@ -235,7 +236,7 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 	};
 	polygonLayout[1]=
 	{
-		"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0,
+		"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0,
 	};
 
 	//得到Layout中元素的数量

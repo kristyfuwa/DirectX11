@@ -8,7 +8,9 @@
 #include<dxgi.h>
 #include<d3dcommon.h>
 #include<d3d11.h>
-#include <xnamath.h>
+//#include <xnamath.h>
+
+#include <D3DX10math.h>
 
 class D3D
 {
@@ -26,9 +28,9 @@ public:
 	ID3D11Device*						GetDevice();
 	ID3D11DeviceContext*				GetDeviceContext();
 
-	void					GetProjectionMatrix(XMMATRIX&);
-	void					GetWorldMatrix(XMMATRIX&);
-	void					GetOrthoMatrix(XMMATRIX&);
+	void					GetProjectionMatrix(D3DXMATRIX&);
+	void					GetWorldMatrix(D3DXMATRIX&);
+	void					GetOrthoMatrix(D3DXMATRIX&);
 
 	void					GetVideoCardInfo(char*, int&);
 
@@ -44,8 +46,8 @@ private:
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView*	 m_depthStencilView; //深度目标视图
 	ID3D11RasterizerState*	 m_rasterState; //渲染状态
-	XMMATRIX				 m_projectionMatrix; //投影矩阵
-	XMMATRIX				 m_worldMatrix;//世界坐标系矩阵
-	XMMATRIX				 m_orthoMatrix;//正交投影矩阵
+	D3DXMATRIX				 m_projectionMatrix; //投影矩阵
+	D3DXMATRIX				 m_worldMatrix;//世界坐标系矩阵
+	D3DXMATRIX				 m_orthoMatrix;//正交投影矩阵
 };
 

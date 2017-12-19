@@ -39,5 +39,6 @@ private:
 	ID3D11PixelShader*		m_pPixelShader;
 	ID3D11InputLayout*		m_pLayout;
 	ID3D11Buffer*			m_pMatrixBuffer;
+
 };
 

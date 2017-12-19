@@ -2,6 +2,9 @@
 #include <windows.h>
 
 #include "D3D.h"
+#include "Camera.h"
+#include "Model.h"
+#include "ColorShader.h"
 
 /////////////
 // GLOBALS //
@@ -28,6 +31,9 @@ private:
 	bool	Render();
 
 	//定义一个D3D类成员变量
-	D3D*	m_pD3D;
+	D3D*			m_pD3D;
+	Camera*			m_pCamera;
+	Model*			m_pModel;
+	ColorShader*	m_pColorShader;
 };
 

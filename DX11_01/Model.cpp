@@ -111,19 +111,29 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 	}
 
 	//创建顺时针方向的三角形，左手规则;
-	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
+	//vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
+	//vertices[0].color = D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f);
+
+	//vertices[1].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+	//vertices[1].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+
+	//vertices[2].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	//vertices[2].color = D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f);
+
+	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);  // 左下
 	vertices[0].color = D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[1].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+	vertices[1].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);  // 中上.
 	vertices[1].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[2].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	vertices[2].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);  // 底右
 	vertices[2].color = D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f);
+
 
 	//设置索引缓冲数据;
 	indices[0] = 0;
-	indices[1] = 2;
-	indices[2] = 1;
+	indices[1] = 1;
+	indices[2] = 2;
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_iVertexCount;
