@@ -230,6 +230,23 @@ LRESULT	CALLBACK EngineManager::MessageHandler(HWND hwnd, UINT umsg, WPARAM wpar
 		m_pInput->KeyUp((unsigned int)wparam);
 		return 0;
 	}
+	case WM_SIZE:
+	{
+		int screenWidth = 0;
+		int screenHeight = 0;
+
+		screenWidth = LOWORD(lparam);
+		screenHeight = HIWORD(lparam);
+
+		//窗口大小发生改变时，重新初始化图形对象
+		if (m_pGraphics)
+		{
+			bool result = m_pGraphics->Initialize(screenWidth, screenHeight, hwnd);
+			if (!result)
+				return false;
+		}
+		return 0;
+	}
 		//任何其它消息发送到windows缺省处理.
 	default:
 	{

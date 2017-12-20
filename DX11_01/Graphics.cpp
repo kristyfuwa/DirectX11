@@ -23,6 +23,10 @@ Graphics::~Graphics()
 bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 {
 	bool result;
+
+	//如果对象已经存在，先释放掉他们
+	Shutdown();
+
 	m_pD3D = new D3D;
 	if (!m_pD3D)
 		return false;
