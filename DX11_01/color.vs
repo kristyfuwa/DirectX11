@@ -27,16 +27,11 @@ PixelInputType ColorVertexShader(VertexInputType input)
 
 	// 乘以3个矩阵，得到clip空间的坐标。
 	output.position = mul(input.position, worldMatrix);
-	output.position = mul(input.position, viewMatrix);
-	output.position = mul(input.position, projectionMatrix);
+	output.position = mul(output.position, viewMatrix);
+	output.position = mul(output.position, projectionMatrix);
 
 	//直接输出顶点的颜色(.顶点之间的颜色，会采用插值的方式计算）
 	output.color = input.color;
 
 	return output;
-}
-
-float ColorPixelShader(PixelInputType input):SV_TARGET
-{
-	return input.color;
 }

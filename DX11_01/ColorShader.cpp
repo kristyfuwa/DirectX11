@@ -214,7 +214,8 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 		}
 		return false;
 	}
-	errorMessage->Release();
+	if(errorMessage)
+		errorMessage->Release();
 
 
 	//´Ó»º³å´´½¨vs shader,ps shader
