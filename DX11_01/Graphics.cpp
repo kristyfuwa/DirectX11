@@ -45,7 +45,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 	
 	//Set Camera Position
 
-	m_pCamera->SetPosition(0.0f, 0.0f, -10.0f);
+	m_pCamera->SetPosition(4.0f, 6.0f, -10.0f);
 
 	m_pModel = new Model();
 	if (!m_pModel)
