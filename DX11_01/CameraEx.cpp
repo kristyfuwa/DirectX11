@@ -105,13 +105,32 @@ void CameraEx::yaw(float angle)
 void CameraEx::getViewMatrix(D3DXMATRIX* view)
 {
 	// 保持view局部坐标系，各轴的彼此正交
+	//D3DXVec3Normalize(&m_vLook, &m_vLook);
+	////look X right
+	//D3DXVec3Cross(&m_vUp, &m_vLook, &m_vRight);
+	//D3DXVec3Normalize(&m_vUp, &m_vUp);
+
+	//D3DXVec3Cross(&m_vRight, &m_vUp, &m_vLook);
+	//D3DXVec3Normalize(&m_vRight,&m_vRight);
+
+	//D3DXVec3Normalize(&m_vUp, &m_vUp);
+	////right X up
+	//D3DXVec3Cross(&m_vLook, &m_vRight, &m_vUp);
+	//D3DXVec3Normalize(&m_vLook, &m_vLook);
+
+	////up X look
+	//D3DXVec3Cross(&m_vRight, &m_vUp, &m_vLook);
+	//D3DXVec3Normalize(&m_vRight, &m_vRight);
+
+	D3DXVec3Normalize(&m_vRight, &m_vRight);
+	//right X up
+	D3DXVec3Cross(&m_vLook, &m_vRight, &m_vUp);
 	D3DXVec3Normalize(&m_vLook, &m_vLook);
+
 	//look X right
 	D3DXVec3Cross(&m_vUp, &m_vLook, &m_vRight);
 	D3DXVec3Normalize(&m_vUp, &m_vUp);
 
-	D3DXVec3Cross(&m_vRight, &m_vUp, &m_vLook);
-	D3DXVec3Normalize(&m_vRight,&m_vRight);
 
 
 	float x = -D3DXVec3Dot(&m_vRight,&m_vPos);
