@@ -5,7 +5,7 @@
 Graphics::Graphics()
 {
 	m_pD3D = nullptr;
-	m_pCamera = nullptr;
+	m_pCameraEx = nullptr;
 	m_pColorShader = nullptr;
 	m_pModel = nullptr;
 }
@@ -39,13 +39,13 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 		return false;
 	}
 
-	m_pCamera = new Camera();
-	if (!m_pCamera)
+	m_pCameraEx = new CameraEx();
+	if (!m_pCameraEx)
 		return false;
 	
 	//Set Camera Position
 
-	m_pCamera->SetPosition(4.0f, 6.0f, -10.0f);
+	m_pCameraEx->setPosition(&D3DXVECTOR3(0.0f, 0.0f, -10.0f));
 
 	m_pModel = new Model();
 	if (!m_pModel)
@@ -87,10 +87,10 @@ void Graphics::Shutdown()
 		m_pModel = 0;
 	}
 
-	if (m_pCamera)
+	if (m_pCameraEx)
 	{
-		delete m_pCamera;
-		m_pCamera = 0;
+		delete m_pCameraEx;
+		m_pCameraEx = 0;
 	}
 
 	if (m_pD3D)
@@ -105,6 +105,19 @@ void Graphics::Shutdown()
 
 bool Graphics::Frame()
 {
+	bool result;
+	// 调用Render函数，渲染3D场景
+	// Render是GraphicsClass的私有函数.
+
+	result = Render();
+	if (!result)
+		return false;
+	return true;
+}
+
+bool Graphics::Render()
+{
+
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
 	bool result;
 
@@ -112,25 +125,20 @@ bool Graphics::Frame()
 	m_pD3D->BeginScene(0.0f, 0.0f, 0.5f, 1.0f);
 
 	//得到view矩阵
-	m_pCamera->Render();
+	//m_pCamera->Render();
 
-	m_pCamera->GetViewMatirx(viewMatrix);
+	m_pCameraEx->getViewMatrix(&viewMatrix);
 	m_pD3D->GetWorldMatrix(worldMatrix);
 	m_pD3D->GetProjectionMatrix(projectionMatrix);
 
 	//把模型顶点和索引顶点放入管线，准备渲染
 	m_pModel->Render(m_pD3D->GetDeviceContext());
 
-	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(), m_pModel->GetIndexCount(),worldMatrix, viewMatrix, projectionMatrix);
+	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(), m_pModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
 	m_pD3D->EndScene();
 
-	return true;
-}
-
-bool Graphics::Render()
-{
 	return true;
 }

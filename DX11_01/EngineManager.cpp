@@ -96,6 +96,32 @@ bool EngineManager::Frame()
 		return false;
 	}
 
+	////如果A,S,D,W,Q,E,Z,X,C键按下，移动摄像机
+	if (GetAsyncKeyState('W') & 0x8000)
+		m_pGraphics->m_pCameraEx->walk(-0.1);
+	if (GetAsyncKeyState('S') & 0x8000)
+		m_pGraphics->m_pCameraEx->walk(0.1);
+
+	if (GetAsyncKeyState('A') & 0x8000)
+		m_pGraphics->m_pCameraEx->strafe(-0.1);
+	if (GetAsyncKeyState('D') & 0x8000)
+		m_pGraphics->m_pCameraEx->strafe(0.1);
+
+	if (GetAsyncKeyState('Q') & 0x8000)
+		m_pGraphics->m_pCameraEx->fly(-0.1);
+	if (GetAsyncKeyState('E') & 0x8000)
+		m_pGraphics->m_pCameraEx->fly(0.1);
+
+	if (GetAsyncKeyState('Z') & 0x8000)
+		m_pGraphics->m_pCameraEx->pitch(D3DX_PI/180);
+	if (GetAsyncKeyState('X') & 0x8000)
+		m_pGraphics->m_pCameraEx->yaw(D3DX_PI/180);
+	if (GetAsyncKeyState('C') & 0x8000)
+		m_pGraphics->m_pCameraEx->roll(D3DX_PI / 180);
+	
+	//动画，旋转摄像机
+	//m_pGraphics->m_pCameraEx->roll(D3DX_PI / 180);
+
 	result = m_pGraphics->Frame();
 	if (!result)
 	{
