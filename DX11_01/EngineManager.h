@@ -4,6 +4,7 @@
 #include <windows.h>
 #include "Input.h"
 #include "Graphics.h"
+#include "Timer.h"
 
 class EngineManager
 {
@@ -29,6 +30,7 @@ private:
 
 	Input*		m_pInput;
 	Graphics*	m_pGraphics;
+	Timer*		m_pTimer;
 };
 
 //定义静态的回调函数以及应用程序句柄

@@ -13,6 +13,8 @@ public:
 	CameraEx(const CameraEx& other);
 	~CameraEx();
 
+	void Reset();
+
 	void strafe(float units);//左右
 	void fly(float units);//上下
 	void walk(float units);//前后

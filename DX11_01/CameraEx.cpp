@@ -20,6 +20,15 @@ CameraEx::CameraEx(const CameraEx& other)
 CameraEx::~CameraEx()
 {
 }
+
+void CameraEx::Reset()
+{
+	m_vPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_vLook = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+	m_vUp = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	m_vRight = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
+}
+
 //扫视，是指保持观察方向不变，沿向量right方向从一边平移到另一边
 void CameraEx::strafe(float units)
 {

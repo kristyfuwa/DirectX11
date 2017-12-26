@@ -27,7 +27,6 @@ public:
 	void	Shutdown();
 	bool	Frame();
 
-
 public:
 	CameraEx*			m_pCameraEx;
 private:

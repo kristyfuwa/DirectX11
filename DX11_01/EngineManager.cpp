@@ -6,6 +6,7 @@ EngineManager::EngineManager()
 {
 	m_pInput = 0;
 	m_pGraphics = 0;
+	m_pTimer = 0;
 }
 
 
@@ -36,6 +37,17 @@ bool EngineManager::Initialize()
 	if (!result)
 		return false;
 
+	m_pTimer = new Timer;
+	if (!m_pTimer)
+		return false;
+
+	result = m_pTimer->Initialize();
+	if (!result)
+	{
+		MessageBox(m_hWnd, L"Could not initialize the timer object", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
@@ -51,6 +63,12 @@ void EngineManager::Shutdown()
 	{
 		delete m_pInput;
 		m_pInput = 0;
+	}
+
+	if (m_pTimer)
+	{
+		delete m_pTimer;
+		m_pTimer = 0;
 	}
 
 	ShutdownWindows();
@@ -118,9 +136,20 @@ bool EngineManager::Frame()
 		m_pGraphics->m_pCameraEx->yaw(D3DX_PI/180);
 	if (GetAsyncKeyState('C') & 0x8000)
 		m_pGraphics->m_pCameraEx->roll(D3DX_PI / 180);
-	
+	if (GetAsyncKeyState('R') & 0x8000)
+	{
+		m_pGraphics->m_pCameraEx->Reset();
+		D3DXVECTOR3 campos = D3DXVECTOR3(0.0f, 0.0f, -10.0f);
+		m_pGraphics->m_pCameraEx->setPosition(&campos);
+	}
+
+
+	m_pTimer->Frame();
+
 	//¶¯»­£¬Ðý×ªÉãÏñ»ú
-	//m_pGraphics->m_pCameraEx->roll(D3DX_PI / 180);
+	m_pGraphics->m_pCameraEx->roll(m_pTimer->GetTime() / 1000);
+
+	
 
 	result = m_pGraphics->Frame();
 	if (!result)
