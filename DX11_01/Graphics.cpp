@@ -8,6 +8,7 @@ Graphics::Graphics()
 	m_pCameraEx = nullptr;
 	m_pColorShader = nullptr;
 	m_pModel = nullptr;
+	m_pAxisModel = nullptr;
 }
 
 
@@ -45,7 +46,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 	
 	//Set Camera Position
 
-	m_pCameraEx->setPosition(&D3DXVECTOR3(0.0f, 0.0f, -10.0f));
+	m_pCameraEx->setPosition(&D3DXVECTOR3(0.0f, 0.0f, -20.0f));
 
 	m_pModel = new Model();
 	if (!m_pModel)
@@ -55,6 +56,18 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 	{
 		MessageBox(hWnd, L"Could not initialize the model object", L"Error", MB_OK);
 		return false;
+	}
+
+	m_pAxisModel = new AxisModel();
+	if (!m_pAxisModel)
+		return false;
+	//初始化坐标轴模型对象
+	result = m_pAxisModel->Initialize(m_pD3D->GetDevice());
+	if (!result)
+	{
+		MessageBox(hWnd, L"Could not initialize the Axis object", L"Error", MB_OK);
+		return false;
+
 	}
 
 	m_pColorShader = new ColorShader();
@@ -91,6 +104,13 @@ void Graphics::Shutdown()
 	{
 		delete m_pCameraEx;
 		m_pCameraEx = 0;
+	}
+
+	if (m_pAxisModel)
+	{
+		m_pAxisModel->Shutdown();
+		delete m_pAxisModel;
+		m_pAxisModel = 0;
 	}
 
 	if (m_pD3D)
@@ -130,6 +150,12 @@ bool Graphics::Render()
 	m_pCameraEx->getViewMatrix(&viewMatrix);
 	m_pD3D->GetWorldMatrix(worldMatrix);
 	m_pD3D->GetProjectionMatrix(projectionMatrix);
+
+	m_pAxisModel->Render(m_pD3D->GetDeviceContext());
+	//用shader渲染
+	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(), m_pAxisModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
 
 	//把模型顶点和索引顶点放入管线，准备渲染
 	m_pModel->Render(m_pD3D->GetDeviceContext());

@@ -5,6 +5,7 @@
 #include "CameraEx.h"
 #include "Model.h"
 #include "ColorShader.h"
+#include "AxisModel.h"
 
 /////////////
 // GLOBALS //
@@ -36,6 +37,7 @@ private:
 	D3D*			m_pD3D;
 
 	Model*			m_pModel;
+	AxisModel*		m_pAxisModel;
 	ColorShader*	m_pColorShader;
 };
 
