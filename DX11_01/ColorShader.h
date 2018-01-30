@@ -3,7 +3,7 @@
 #include <D3DX10math.h>
 #include <D3DX11async.h>
 #include <fstream>
-
+#include "common.h"
 using namespace std;
 
 class ColorShader

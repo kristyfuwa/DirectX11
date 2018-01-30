@@ -23,6 +23,7 @@ AxisModel::~AxisModel()
 bool AxisModel::Initialize(ID3D11Device* device)
 {
 	bool result;
+	//int* p = (int*)malloc(sizeof(int) * 2);
 	result = InitializeBuffers(device);
 	if (!result)
 		return false;

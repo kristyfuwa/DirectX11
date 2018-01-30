@@ -102,7 +102,11 @@ bool ColorShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3D
 	//设置shader参数
 	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectMatrix);
 	if (!result)
+	{
+		HR(result);
 		return false;
+	}
+		
 
 	//用shader渲染指定缓冲顶点
 	RenderShader(deviceContext, indexCount);
@@ -124,7 +128,10 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	//锁定常量缓冲，以便能够写入
 	result = deviceContext->Map(m_pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	//得到const buffer指针
 	dataPtr = (MatrixBufferType*)mappedResource.pData;
@@ -195,6 +202,7 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 		{
 			MessageBox(hwnd, vsFileName, L"Missing shader file", MB_OK);
 		}
+		HR(result);
 		return false;
 	}
 
@@ -212,6 +220,7 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 		{
 			MessageBox(hwnd, psFileName, L"Missing shader file", MB_OK);
 		}
+		HR(result);
 		return false;
 	}
 	if(errorMessage)
@@ -221,11 +230,18 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 	//从缓冲创建vs shader,ps shader
 	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_pVertexShader);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
+		
 
 	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pPixelShader);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 
 
@@ -246,7 +262,10 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 	//创建顶点输入布局
 	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_pLayout);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 
 	vertexShaderBuffer->Release();
@@ -265,6 +284,9 @@ bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 	//// 创建const buffer指针，以便访问shader常量.
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_pMatrixBuffer);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 	return true;
 }

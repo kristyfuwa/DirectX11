@@ -1,6 +1,7 @@
 #pragma once
 //定义该宏能够减少windows头文件的大小，使编译器不编译一些不必要的文件，加快编译时间
 #define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include "Input.h"
 #include "Graphics.h"

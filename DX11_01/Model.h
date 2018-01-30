@@ -16,13 +16,13 @@ public:
 	Model(const Model&);
 	~Model();
 	
-	bool Initialize(ID3D11Device*);
+	bool Initialize(ID3D11Device*, int, int, float);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 	int	 GetIndexCount();
-
+	float GetHeight(float x, float z)const;
 private:
-	bool InitializeBuffers(ID3D11Device*);
+	bool InitializeBuffers(ID3D11Device*, int, int, float);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 

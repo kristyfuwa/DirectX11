@@ -47,30 +47,48 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	// 创建一个DirectX graphics interface factory.
 	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	//用接口工厂创建一个主显卡的适配
 	result = factory->EnumAdapters(0, &adapter);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	// 得到主适配器的输出.
 	result = adapter->EnumOutputs(0, &adapterOutput);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	//得到适合 DXGI_FORMAT_R8G8B8A8_UNORM 的显示模式.
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	displayModeList = new DXGI_MODE_DESC[numModes];
 	if (!displayModeList)
+	{
+		HR(result);
 		return false;
+	}
 
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	//遍历所有显示模式，得到刷新率两个参数值numerator 和 denominato
 	for (i = 0; i < numModes; ++i)
@@ -88,7 +106,10 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//// 得到显卡描述
 	result = adapter->GetDesc(&adapterDesc);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	// 保存显存大小.
 	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
@@ -97,22 +118,10 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//wcstombs_s, wide char转化为char
 	error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
 	if (error != 0)
+	{
+		HR(result);
 		return false;
-
-	// 释放显示模式列表
-	delete[]displayModeList;
-	displayModeList = 0;
-
-	//释放适配器输出.
-	adapterOutput->Release();
-	adapterOutput = 0;
-
-	//释放适配器
-	adapter->Release();
-	adapter = 0;
-
-	factory->Release();
-	factory = 0;
+	}
 
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 	swapChainDesc.BufferCount = 1;
@@ -161,26 +170,125 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 
 	
 	//不设置标志
-	swapChainDesc.Flags = 0;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	// 设置feature level为D3D11
 	// 如果显卡不支持D3D11,我们能够通过设置这个参数，使用D3D10,或者9.
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
-	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
-		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL,&m_deviceContext);
+
+	////在debug模式下，使得创建的设备支持debug.
+	UINT createDeviceFlags = 0;
+#if defined(DEBUG) || defined(_DEBUG)
+	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	//方式一，禁用alt+enter全屏
+	{
+		result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, &featureLevel, 1,
+			D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
+
+		//注意：D3D11CreateDeviceAndSwapChain创建设备和交换链时候，内部会使用自己的接口工厂。
+
+		if (FAILED(result))
+		{
+			HR(result);
+			return false;
+		}
+
+		//得到 D3D11CreateDeviceAndSwapChain函数内部使用接口工厂 
+		//组件本身就提供对自己查询的一个接口，让客户去询问组件，问它是否支持某个接口，
+		//调用QueryInterface来判断组件是否支持某个特定的接口
+		IDXGIDevice* pDXGIDevice;
+		result = m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&pDXGIDevice);
+		if (FAILED(result))
+		{
+			HR(result);
+			return false;
+		}
+
+		IDXGIAdapter* pDXGIAdapter;
+		result = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&pDXGIAdapter);
+		if (FAILED(result))
+		{
+			HR(result);
+			return false;
+		}
+
+		IDXGIFactory* pIDXGIFactory;
+		result = pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pIDXGIFactory);
+		if (FAILED(result))
+		{
+			HR(result);
+			return false;
+		}
+		//禁止alt+enter全屏
+		//以拦截消息的方式去除ALT+ENTER的全屏/窗口模式直接的切换;
+		//DXGI应该是利用Hook窗口消息处理过程，监听ALT + ENTER按键，
+		//来实现自动的在窗口模式和全屏模式切换。
+		//而用DXGI_MWA_NO_WINDOW_CHANGES可以指定取消监听程序消息队列，来"取消"此功能。
+		pIDXGIFactory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_WINDOW_CHANGES);
+
+	}
+
+	/*
+	//方式二，禁用alt+enter全屏（我们分开创建device和swapchain）
+	{
+		//分开创建device和交换链，可以屏蔽dxgi自动的hook alt+enter
+		//注意的两点：如果用第一个参数用NULL,第二个参数为D3D_DRIVER_TYPE_HARDWARE，则后面创建swapchain 
+		//会fail，如果直接用adapter，不改变第二个参数，则会提示创建设备失败，adapter无效。 
+		result = D3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, createDeviceFlags, &featureLevel, 1,
+			D3D11_SDK_VERSION, &m_device, NULL, &m_deviceContext);
+		if (FAILED(result))
+		{
+			HR(result);
+			return false;
+		}
+		//创建交换链
+		result = factory->CreateSwapChain(m_device, &swapChainDesc, &m_swapChain);
+		if (FAILED(result))
+		{
+			HR(result);
+			return false;
+		}
+		//禁止DXGI监视消息队列，捕捉ALT+ENTER，在全屏和窗口模式之间切换 
+		factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
+
+	}
+	*/
+
+	// 释放显示模式列表
+	delete[]displayModeList;
+	displayModeList = 0;
+
+	//释放适配器输出.
+	adapterOutput->Release();
+	adapterOutput = 0;
+
+	//释放适配器
+	adapter->Release();
+	adapter = 0;
+
+	factory->Release();
+	factory = 0;
+	
 
 
-	if (FAILED(result))
-		return false;
+
 
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	// 用后缓冲创建渲染目标视图.
 	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	//释放后缓冲（引用计数减1）
 	backBufferPtr->Release();
@@ -205,7 +313,10 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	//创建深度缓冲
 	result = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 
 	// 初始化深度模版状态描述.
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
@@ -235,7 +346,10 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	// 创建深度模版状态，使其生效
 	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
 	if (FAILED(result))
+	{
+		HR(result);
 		return false;
+	}
 	// 设置深度模版状态.
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
@@ -251,6 +365,7 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
 	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -273,6 +388,7 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
 	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -434,4 +550,34 @@ void D3D::GetVideoCardInfo(char* cardName, int& memory)
 	strcpy_s(cardName, 128, m_videoCardDescription);
 	memory = m_videoCardMemory;
 	return;
+}
+
+bool D3D::SetFillMode(D3D11_FILL_MODE fillmode)
+{
+	
+	// 设置光栅化描述，指定多边形如何被渲染.
+	D3D11_RASTERIZER_DESC rasterDesc;
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_BACK;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = fillmode;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	bool result;
+	// 创建光栅化状态
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	if (FAILED(result))
+	{
+		HR(result);
+		return false;
+	}
+
+	//设置光栅化状态，使其生效
+	m_deviceContext->RSSetState(m_rasterState);
+	return true;
 }

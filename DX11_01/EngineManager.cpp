@@ -147,11 +147,11 @@ bool EngineManager::Frame()
 	m_pTimer->Frame();
 
 	//¶¯»­£¬Ğı×ªÉãÏñ»ú
-	m_pGraphics->m_pCameraEx->roll(m_pTimer->GetTime() / 1000);
+	//m_pGraphics->m_pCameraEx->roll(m_pTimer->GetTime() / 1000);
 
 	
 
-	result = m_pGraphics->Frame();
+	result = m_pGraphics->Frame(m_pTimer->GetTime() / 1000.0f);
 	if (!result)
 	{
 		return false;

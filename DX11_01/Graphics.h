@@ -1,12 +1,12 @@
 #pragma once
 #include <windows.h>
-
+#include <cstdlib>
 #include "D3D.h"
 #include "CameraEx.h"
 #include "Model.h"
 #include "ColorShader.h"
 #include "AxisModel.h"
-
+#include "WaterModel.h"
 /////////////
 // GLOBALS //
 /////////////
@@ -26,12 +26,13 @@ public:
 
 	bool	Initialize(int ,int,HWND);
 	void	Shutdown();
-	bool	Frame();
+	bool	Frame(float);
 
 public:
 	CameraEx*			m_pCameraEx;
+	WaterModel*			m_pWaterModel;
 private:
-	bool	Render();
+	bool	Render(float);
 
 	//定义一个D3D类成员变量
 	D3D*			m_pD3D;
