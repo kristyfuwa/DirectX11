@@ -123,8 +123,6 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		return false;
 	}
 
-	//如果屏幕高度或者宽度为0，则会创建深度缓冲失败， 
-	//当窗口最小化时候，会出现窗口为0的情况。 
 	if (screenWidth < 1)
 		screenWidth = 1;
 	if (screenHeight < 1)
@@ -557,34 +555,4 @@ void D3D::GetVideoCardInfo(char* cardName, int& memory)
 	strcpy_s(cardName, 128, m_videoCardDescription);
 	memory = m_videoCardMemory;
 	return;
-}
-
-bool D3D::SetFillMode(D3D11_FILL_MODE fillmode)
-{
-	
-	// 设置光栅化描述，指定多边形如何被渲染.
-	D3D11_RASTERIZER_DESC rasterDesc;
-	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_BACK;
-	rasterDesc.DepthBias = 0;
-	rasterDesc.DepthBiasClamp = 0.0f;
-	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = fillmode;
-	rasterDesc.FrontCounterClockwise = false;
-	rasterDesc.MultisampleEnable = false;
-	rasterDesc.ScissorEnable = false;
-	rasterDesc.SlopeScaledDepthBias = 0.0f;
-
-	bool result;
-	// 创建光栅化状态
-	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
-	if (FAILED(result))
-	{
-		HR(result);
-		return false;
-	}
-
-	//设置光栅化状态，使其生效
-	m_deviceContext->RSSetState(m_rasterState);
-	return true;
 }
