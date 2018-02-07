@@ -9,7 +9,10 @@ Graphics::Graphics()
 	m_pColorShader = nullptr;
 	m_pModel = nullptr;
 	m_pAxisModel = nullptr;
-	m_pWaterModel = nullptr;
+	m_pLight = nullptr;
+	m_pLightShader = nullptr;
+	m_pCubeModel = nullptr;
+	m_pPlaneModel = nullptr;
 }
 
 
@@ -47,12 +50,12 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 	
 	//Set Camera Position
 
-	m_pCameraEx->setPosition(&D3DXVECTOR3(0.0f, 0.0f, -20.0f));
+	m_pCameraEx->setPosition(&D3DXVECTOR3(8.0f, 3.0f, -20.0f));
 
 	m_pModel = new Model();
 	if (!m_pModel)
 		return false;
-	result = m_pModel->Initialize(m_pD3D->GetDevice(),300,300,1.0f);
+	result = m_pModel->Initialize(m_pD3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hWnd, L"Could not initialize the model object", L"Error", MB_OK);
@@ -71,18 +74,29 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 
 	}
 
-	//创建水模型
-	m_pWaterModel = new WaterModel();
-	if (!m_pWaterModel)
+	//创建平面模型
+	m_pPlaneModel = new PlaneModel();
+	if (!m_pPlaneModel)
 		return false;
-	//初始化水模型对象
-	result = m_pWaterModel->Initialize(m_pD3D->GetDevice(), 257, 257, 0.5f, 0.03f, 3.25f, 0.4f);
+	//初始化水平模型对象
+	result = m_pPlaneModel->Initialize(m_pD3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hWnd, L"Could not initialize the water model", L"Error", MB_OK);
 		return false;
 	}
 	
+	//初始化Cube模型
+	m_pCubeModel = new CubeModel();
+	if (!m_pCubeModel)
+		return false;
+	result = m_pCubeModel->Initialize(m_pD3D->GetDevice());
+	if (!result)
+	{
+		MessageBox(hWnd, L"Could not initialize the cube model", L"Error", MB_OK);
+		return false;
+	}
+
 	m_pColorShader = new ColorShader();
 	if (!m_pColorShader)
 		return false;
@@ -93,6 +107,22 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 		MessageBox(hWnd, L"Could not initialize the color shader", L"Error", MB_OK);
 		return false;
 	}
+
+	//创建光照shader类
+	m_pLightShader = new LightShader();
+	if (!m_pLightShader)
+		return false;
+	result = m_pLightShader->Initialize(m_pD3D->GetDevice(), hWnd);
+	if (!result)
+	{
+		MessageBox(hWnd, L"Could not initialize the light shader", L"Error", MB_OK);
+		return false;
+	}
+
+	//创建光源对象
+	m_pLight = new Light();
+	if (!m_pLight)
+		return false;
 
 	return true;
 }
@@ -126,11 +156,31 @@ void Graphics::Shutdown()
 		m_pAxisModel = 0;
 	}
 
-	if (m_pWaterModel)
+	if (m_pCubeModel)
 	{
-		m_pWaterModel->Shutdown();
-		delete m_pWaterModel;
-		m_pWaterModel = 0;
+		m_pCubeModel->Shutdown();
+		delete m_pCubeModel;
+		m_pCubeModel = 0;
+	}
+
+	if (m_pLight)
+	{
+		delete m_pLight;
+		m_pLight = 0;
+	}
+
+	if (m_pLightShader)
+	{
+		m_pLightShader->Shutdown();
+		delete m_pLightShader;
+		m_pLightShader = 0;
+	}
+
+	if (m_pPlaneModel)
+	{
+		m_pPlaneModel->Shutdown();
+		delete m_pPlaneModel;
+		m_pPlaneModel = 0;
 	}
 
 	if (m_pD3D)
@@ -143,19 +193,19 @@ void Graphics::Shutdown()
 	return;
 }
 
-bool Graphics::Frame(float dt)
+bool Graphics::Frame()
 {
 	bool result;
 	// 调用Render函数，渲染3D场景
 	// Render是GraphicsClass的私有函数.
 
-	result = Render(dt);
+	result = Render();
 	if (!result)
 		return false;
 	return true;
 }
 
-bool Graphics::Render(float dt)
+bool Graphics::Render()
 {
 
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
@@ -164,15 +214,9 @@ bool Graphics::Render(float dt)
 	//设置framebuffer为浅蓝色
 	m_pD3D->BeginScene(0.0f, 0.0f, 0.5f, 1.0f);
 
-	//得到view矩阵
-	//m_pCamera->Render();
-
 	m_pCameraEx->getViewMatrix(&viewMatrix);
 	m_pD3D->GetWorldMatrix(worldMatrix);
 	m_pD3D->GetProjectionMatrix(projectionMatrix);
-
-	//设置为实体填充模式
-	m_pD3D->SetFillMode(D3D11_FILL_SOLID);
 
 	m_pAxisModel->Render(m_pD3D->GetDeviceContext());
 	//用shader渲染
@@ -182,35 +226,37 @@ bool Graphics::Render(float dt)
 
 	//把模型顶点和索引顶点放入管线，准备渲染
 	m_pModel->Render(m_pD3D->GetDeviceContext());
-
 	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(), m_pModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
-	static float t_base = 0.0f;
-	static float total_time = 0.0f;
-	total_time += dt;
-	if (total_time - t_base >= 0.25f)
-	{
-		t_base += 0.25f;
-		int i = 5 + rand() % 250;
-		int j = 5 + rand() % 250;
+	D3DXVECTOR3 cameraPos;
+	D3DXVECTOR4 realCameraPos;
+	D3DXVECTOR4 Ke = D3DXVECTOR4(0.8, 0.0,0.2, 1.0);
+	D3DXVECTOR4 Ka = D3DXVECTOR4(0.2, 0.2, 0.2, 1.0);
+	D3DXVECTOR4 Kd = D3DXVECTOR4(0.7, 0.5, 0.6,1.0);
+	D3DXVECTOR4 Ks = D3DXVECTOR4(1.0, 1.0,1.0, 1.0);
+	m_pCameraEx->getPosition(&cameraPos);
+	realCameraPos = D3DXVECTOR4(cameraPos.x, cameraPos.y, cameraPos.z, 1.0);
 
-		//得到1到2之间的一个浮点数
-		float r = 1.0f + (float)(rand()) / (float)RAND_MAX*(2.0f - 1.0f);
-		m_pWaterModel->Disturb(i, j, r);
-	}
-
-	m_pWaterModel->Update(m_pD3D->GetDeviceContext(), dt);
-	//设置线框模式
-	m_pD3D->SetFillMode(D3D11_FILL_WIREFRAME);
-	//把模型顶点和索引缓冲放入管线，准备渲染
-	m_pWaterModel->Render(m_pD3D->GetDeviceContext());
-	
-	//用shader渲染
-	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(),m_pWaterModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_pCubeModel->Render(m_pD3D->GetDeviceContext());
+	result = m_pLightShader->Render(m_pD3D->GetDeviceContext(), m_pCubeModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+		m_pLight->GetPosition(), m_pLight->GetLightColor(), m_pLight->GetGlobalAmbient(),
+		realCameraPos , Ke, Ka, Kd, Ks, m_pLight->GetDirection(), m_pLight->GetShininess());
 	if (!result)
 		return false;
+
+	Ke = D3DXVECTOR4(0.2, 0.8, 0.0, 1.0);
+	Ka = D3DXVECTOR4(0.3, 0.3, 0.3, 1.0);
+	Kd = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
+	Ks = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
+
+	m_pPlaneModel->Render(m_pD3D->GetDeviceContext());
+	result = m_pLightShader->Render(m_pD3D->GetDeviceContext(), m_pPlaneModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_pLight->GetPosition(), m_pLight->GetLightColor(), m_pLight->GetGlobalAmbient(),
+		realCameraPos, Ke, Ka, Kd, Ks, m_pLight->GetDirection(), m_pLight->GetShininess());
+	if (!result)
+		return false;
+
 	m_pD3D->EndScene();
 
 	return true;

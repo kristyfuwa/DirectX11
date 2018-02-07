@@ -149,9 +149,8 @@ bool EngineManager::Frame()
 	//¶¯»­£¬Ğı×ªÉãÏñ»ú
 	//m_pGraphics->m_pCameraEx->roll(m_pTimer->GetTime() / 1000);
 
-	
 
-	result = m_pGraphics->Frame(m_pTimer->GetTime() / 1000.0f);
+	result = m_pGraphics->Frame();
 	if (!result)
 	{
 		return false;

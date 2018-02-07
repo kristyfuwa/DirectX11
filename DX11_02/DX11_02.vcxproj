@@ -180,10 +180,12 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps" />
-    <None Include="color.vs" />
-    <None Include="light.ps" />
-    <None Include="light.vs" />
+    <None Include="color.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="light.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

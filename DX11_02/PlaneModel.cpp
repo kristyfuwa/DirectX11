@@ -55,8 +55,8 @@ bool PlaneModel::InitializeBuffers(ID3D11Device* device)
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 
 	//首先，我们创建2个临时缓冲存放顶点和索引数据，以便后面使用。. 
-	m_iVertexCount = 4;
-	m_iIndexCount = 6;
+	m_iVertexCount = 8;
+	m_iIndexCount = 36;
 
 	vertices = new VertexType[m_iVertexCount];
 	if (!vertices)
@@ -69,7 +69,7 @@ bool PlaneModel::InitializeBuffers(ID3D11Device* device)
 	//创建顺时针方向的三角形，左手规则
 	// 设置顶点数据.
 	vertices[0].position = D3DXVECTOR3(-50.0f, -3.0f, -50.0f);
-	vertices[0].normal = D3DXVECTOR3(0.0f,1.0f,0.0f);
+	vertices[0].normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	vertices[1].position = D3DXVECTOR3(-50.0f, -3.0f, 50.0f);
 	vertices[1].normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -79,6 +79,7 @@ bool PlaneModel::InitializeBuffers(ID3D11Device* device)
 
 	vertices[3].position = D3DXVECTOR3(50.0f, -3.0f, -50.0f);
 	vertices[3].normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
 
 	// 设置索引缓冲数据.
 	indices[0] = 0;
@@ -170,5 +171,5 @@ void PlaneModel::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// 设置体元语义，渲染线段，画出坐标轴
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

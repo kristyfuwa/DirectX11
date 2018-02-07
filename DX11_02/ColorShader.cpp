@@ -25,7 +25,7 @@ bool ColorShader::Initialize(ID3D11Device* device, HWND hwnd)
 {
 	bool result;
 	//≥ı ºªØvs,ps
-	result = InitializeShader(device, hwnd, L"color.vs", L"color.ps");
+	result = InitializeShader(device, hwnd, L"color.hlsl", L"color.hlsl");
 	if (!result)
 		return false;
 	return true;

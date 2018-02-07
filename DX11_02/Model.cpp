@@ -57,10 +57,6 @@ int Model::GetIndexCount()
 	return m_iIndexCount;
 }
 
-float Model::GetHeight(float x, float z) const
-{
-	return 0.1*(z*sinf(0.1*x) + x*cosf(0.1*z));
-}
 
 void Model::Render(ID3D11DeviceContext* deviceContext)
 {
@@ -108,70 +104,76 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 		return false;
 	}
 
+	indices = new unsigned long[m_iIndexCount];
+	if (!indices)
+	{
+		return false;
+	}
+
 	//创建顺时针方向的三角形，左手规则;
 	// 设置顶点数据.
-		vertices[0].position = D3DXVECTOR3(4.0f, -1.0f, -1.0f);
-		vertices[0].color = WHITE;
+	vertices[0].position = D3DXVECTOR3(4.0f, -1.0f, -1.0f);
+	vertices[0].color = WHITE;
 
-		vertices[1].position = D3DXVECTOR3(4.0f, 1.0f, -1.0f);
-		vertices[1].color = BLACK;
+	vertices[1].position = D3DXVECTOR3(4.0f, 1.0f, -1.0f);
+	vertices[1].color = BLACK;
 
-		vertices[2].position = D3DXVECTOR3(6.0f, 1.0f, -1.0f);
-		vertices[2].color = RED;
+	vertices[2].position = D3DXVECTOR3(6.0f, 1.0f, -1.0f);
+	vertices[2].color = RED;
 
-		vertices[3].position = D3DXVECTOR3(6.0f, -1.0f, -1.0f);
-		vertices[3].color = GREEN;
+	vertices[3].position = D3DXVECTOR3(6.0f, -1.0f, -1.0f);
+	vertices[3].color = GREEN;
 
-		vertices[4].position = D3DXVECTOR3(4.0f, -1.0f, 1.0f);
-		vertices[4].color = BLUE;
+	vertices[4].position = D3DXVECTOR3(4.0f, -1.0f, 1.0f);
+	vertices[4].color = BLUE;
 
-		vertices[5].position = D3DXVECTOR3(4.0f, 1.0f, 1.0f);
-		vertices[5].color = YELLOW;
+	vertices[5].position = D3DXVECTOR3(4.0f, 1.0f, 1.0f);
+	vertices[5].color = YELLOW;
 
-		vertices[6].position = D3DXVECTOR3(6.0f, 1.0f, 1.0f);
-		vertices[6].color = CYAN;
+	vertices[6].position = D3DXVECTOR3(6.0f, 1.0f, 1.0f);
+	vertices[6].color = CYAN;
 
-		vertices[7].position = D3DXVECTOR3(6.0f, -1.0f, 1.0f);
-		vertices[7].color = MAGENTA;
+	vertices[7].position = D3DXVECTOR3(6.0f, -1.0f, 1.0f);
+	vertices[7].color = MAGENTA;
 
-		// 设置索引缓冲数据.
+	// 设置索引缓冲数据.
 
-		indices[0] = 0;  // 前面
-		indices[1] = 1;
-		indices[2] = 2;
-		indices[3] = 0;
-		indices[4] = 2;
-		indices[5] = 3;
-		indices[6] = 4;  // 后面
-		indices[7] = 6;
-		indices[8] = 5;
-		indices[9] = 4;
-		indices[10] = 7;
-		indices[11] = 6;
-		indices[12] = 4;  // 左面
-		indices[13] = 5;
-		indices[14] = 1;
-		indices[15] = 4;
-		indices[16] = 1;
-		indices[17] = 0;
-		indices[18] = 3;  //右面
-		indices[19] = 2;
-		indices[20] = 6;
-		indices[21] = 3;
-		indices[22] = 6;
-		indices[23] = 7;
-		indices[24] = 1;  // 上面
-		indices[25] = 5;
-		indices[26] = 6;
-		indices[27] = 1;
-		indices[28] = 6;
-		indices[29] = 2;
-		indices[30] = 4; // 下面
-		indices[31] = 0;
-		indices[32] = 3;
-		indices[33] = 4;
-		indices[34] = 3;
-		indices[35] = 7;
+	indices[0] = 0;  // 前面
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+	indices[6] = 4;  // 后面
+	indices[7] = 6;
+	indices[8] = 5;
+	indices[9] = 4;
+	indices[10] = 7;
+	indices[11] = 6;
+	indices[12] = 4;  // 左面
+	indices[13] = 5;
+	indices[14] = 1;
+	indices[15] = 4;
+	indices[16] = 1;
+	indices[17] = 0;
+	indices[18] = 3;  //右面
+	indices[19] = 2;
+	indices[20] = 6;
+	indices[21] = 3;
+	indices[22] = 6;
+	indices[23] = 7;
+	indices[24] = 1;  // 上面
+	indices[25] = 5;
+	indices[26] = 6;
+	indices[27] = 1;
+	indices[28] = 6;
+	indices[29] = 2;
+	indices[30] = 4; // 下面
+	indices[31] = 0;
+	indices[32] = 3;
+	indices[33] = 4;
+	indices[34] = 3;
+	indices[35] = 7;
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_iVertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;

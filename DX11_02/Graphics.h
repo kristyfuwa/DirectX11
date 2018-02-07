@@ -9,6 +9,7 @@
 #include "AxisModel.h"
 #include "Light.h"
 #include "LightShader.h"
+#include "PlaneModel.h"
 /////////////
 // GLOBALS //
 /////////////
@@ -28,19 +29,22 @@ public:
 
 	bool	Initialize(int ,int,HWND);
 	void	Shutdown();
-	bool	Frame(float);
+	bool	Frame();
 
 public:
 	CameraEx*			m_pCameraEx;
-	WaterModel*			m_pWaterModel;
 private:
-	bool	Render(float);
+	bool	Render();
 
 	//定义一个D3D类成员变量
 	D3D*			m_pD3D;
 
 	Model*			m_pModel;
 	AxisModel*		m_pAxisModel;
+	CubeModel*		m_pCubeModel;
 	ColorShader*	m_pColorShader;
+	PlaneModel*		m_pPlaneModel;
+	Light*			m_pLight;
+	LightShader*	m_pLightShader;
 };
 

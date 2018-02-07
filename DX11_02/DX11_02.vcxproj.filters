@@ -103,9 +103,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="light.ps" />
-    <None Include="light.vs" />
-    <None Include="color.ps" />
-    <None Include="color.vs" />
+    <FxCompile Include="color.hlsl" />
+    <FxCompile Include="light.hlsl" />
   </ItemGroup>
 </Project>

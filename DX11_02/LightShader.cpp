@@ -24,7 +24,7 @@ bool LightShader::Initialize(ID3D11Device* device, HWND hwnd)
 	bool result;
 
 	// 初始化vs和ps.
-	result = InitializeShader(device, hwnd, L"light.vs", L"light.ps");
+	result = InitializeShader(device, hwnd, L"light.hlsl", L"light.hlsl");
 	if (!result)
 	{
 		return false;
@@ -42,12 +42,13 @@ void LightShader::Shutdown()
 }
 
 bool LightShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-	D3DXMATRIX projectionMatrix, D3DXVECTOR3 cameraPosition)
+	D3DXMATRIX projectionMatrix, D3DXVECTOR4 lightPosition, D3DXVECTOR4 lightColor, D3DXVECTOR4 globalAmbient,
+	D3DXVECTOR4 cameraPosition, D3DXVECTOR4 Ke, D3DXVECTOR4 Ka, D3DXVECTOR4 Kd, D3DXVECTOR4 Ks, D3DXVECTOR3 lightDirection, float shininess)
 {
 	bool result;
 
 	// 设置shader参数.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, cameraPosition);
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix,lightPosition,lightColor,globalAmbient,cameraPosition,Ke,Ka,Kd,Ks,lightDirection,shininess);
 	if (!result)
 	{
 		HR(result);
@@ -79,7 +80,7 @@ bool LightShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 
 	// 编译vs代码.
 	//增加D3D10_SHADER_DEBUG，是为了在perfstuido中查看hlsl代码
-	result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_DEBUG, 0, NULL,
+	result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "LightVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_DEBUG, 0, NULL,
 		&vertexShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result))
 	{
@@ -100,7 +101,7 @@ bool LightShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFil
 
 	//  编译ps代码.
 
-	result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_DEBUG, 0, NULL,
+	result = D3DX11CompileFromFile(psFilename, NULL, NULL, "LightPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_DEBUG, 0, NULL,
 		&pixelShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result))
 	{
@@ -282,7 +283,8 @@ void LightShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, 
 }
 
 bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-	D3DXMATRIX projectionMatrix, D3DXVECTOR3 cameraPosition)
+	D3DXMATRIX projectionMatrix, D3DXVECTOR4 lightPosition, D3DXVECTOR4 lightColor, D3DXVECTOR4 globalAmbient,
+	D3DXVECTOR4 cameraPosition, D3DXVECTOR4 Ke, D3DXVECTOR4 Ka, D3DXVECTOR4 Kd, D3DXVECTOR4 Ks, D3DXVECTOR3 lightDirection, float shininess)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -331,8 +333,15 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	dataPtr2 = (LightMaterialBufferType*)mappedResource.pData;
 
 	// 常量缓冲赋值.
+	dataPtr2->lightPosition = lightPosition;
+	dataPtr2->lightColor = lightColor;
+	dataPtr2->globalAmbient = globalAmbient;
+	dataPtr2->Ka = Ka;
+	dataPtr2->Ke = Ke;
+	dataPtr2->Ks = Ks;
+	dataPtr2->Kd = Kd;
 	dataPtr2->cameraPosition = cameraPosition;
-
+	dataPtr2->shininess = shininess;
 	// 解锁常量缓冲
 	deviceContext->Unmap(m_pLightMaterialBuffer, 0);
 
