@@ -341,6 +341,7 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	dataPtr2->Ks = Ks;
 	dataPtr2->Kd = Kd;
 	dataPtr2->cameraPosition = cameraPosition;
+	dataPtr2->lightDirection = lightDirection;
 	dataPtr2->shininess = shininess;
 	// ½âËø³£Á¿»º³å
 	deviceContext->Unmap(m_pLightMaterialBuffer, 0);

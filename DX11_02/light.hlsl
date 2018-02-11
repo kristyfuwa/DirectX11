@@ -46,7 +46,7 @@ PixelInputType LightVertexShader(VertexInputType input)
 	output.position = mul(output.position, projectionMatrix);
 
 	//世界坐标系中的顶点法向量
-	float N = mul(input.normal,(float3x3)worldMatrix);
+	float3 N = mul(input.normal,(float3x3)worldMatrix);
 	N=normalize(N);
 
 	//世界坐标系中的顶点位置
@@ -60,7 +60,7 @@ PixelInputType LightVertexShader(VertexInputType input)
 	float4 ambient = Ka * globalAmbient;
 
 	//计算漫反射
-	float3 L = normalize(lightDirection);
+	float3 L = -normalize(lightDirection);
 	float n_dot_l = max(dot(N,L),0);
 	float4 diffuse = Kd * lightColor * n_dot_l;
 
@@ -74,7 +74,6 @@ PixelInputType LightVertexShader(VertexInputType input)
 	float4 specular = Ks * lightColor * specularLight;
 
 	output.color.xyz = emissive + ambient + diffuse + specular;
-	output.color.w = 1.0f;
 
 	return output;
 }
