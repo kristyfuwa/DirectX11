@@ -6,6 +6,7 @@ CubeModel::CubeModel()
 {
 	m_iIndexCount = 0;
 	m_iVertexCount = 0;
+	m_pModel = 0;
 }
 
 CubeModel::CubeModel(const CubeModel& others)
@@ -18,10 +19,14 @@ CubeModel::~CubeModel()
 
 }
 
-bool CubeModel::Initialize(ID3D11Device* device)
+bool CubeModel::Initialize(ID3D11Device* device,char* modelFileName)
 {
 	bool result;
 
+	//load in the model;
+	result = LoadModel(modelFileName);
+	if (!result)
+		return false;
 	//初始化顶点缓冲和顶点索引缓冲
 	result = InitializeBuffers(device);
 	if (!result)
@@ -33,7 +38,8 @@ bool CubeModel::Initialize(ID3D11Device* device)
 void CubeModel::Shutdown()
 {
 	ShutdownBuffers();
-
+	//Release the model data;
+	ReleaseModel();
 	return;
 }
 
@@ -85,6 +91,63 @@ void CubeModel::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
+bool CubeModel::LoadModel(char* fileName)
+{
+	ifstream fin;
+	char input;
+	//open model file
+
+	fin.open(fileName);
+	if (fin.fail())
+		return false;
+	
+
+	//read up to the value of vertex count
+	fin.get(input);
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+	//read in the vertex count;
+	fin >> m_iVertexCount;
+
+
+	//set the number of indices to be the same as the vertex count;
+	m_iIndexCount = m_iVertexCount;
+	//Create the model using the vertex count that was read in
+	m_pModel = new ModelType[m_iVertexCount];
+	if (!m_pModel)
+		return false;
+	//read up to the beginning of data;
+	fin.get(input);//换行符\n
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+
+	fin.get(input);//换行符\n
+	fin.get(input);//换行符\n
+
+	//read in the vertex data;
+	for (int i = 0; i < m_iVertexCount; ++i)
+	{
+		fin >> m_pModel[i].x >> m_pModel[i].y >> m_pModel[i].z;
+		fin >> m_pModel[i].tu >> m_pModel[i].tv;
+		fin >> m_pModel[i].nx >> m_pModel[i].ny >> m_pModel[i].nz;
+	}
+	fin.close();
+	return true;
+}
+
+void CubeModel::ReleaseModel()
+{
+	if (m_pModel)
+	{
+		delete[] m_pModel;
+		m_pModel = 0;
+	}
+}
+
 bool CubeModel::InitializeBuffers(ID3D11Device* device)
 {
 	VertexType* vertices;
@@ -110,70 +173,15 @@ bool CubeModel::InitializeBuffers(ID3D11Device* device)
 		return false;
 	}
 
-	//创建顺时针方向的三角形，左手规则;
-	// 设置顶点数据.
-	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
-	vertices[0].normal = D3DXVECTOR3(-1.0f,-1.0f,-1.0f);
+	//load the vertex array and index array with data;
+	for (int i = 0; i < m_iVertexCount; ++i)
+	{
+		vertices[i].position = D3DXVECTOR3(m_pModel[i].x, m_pModel[i].y, m_pModel[i].z);
+		vertices[i].normal = D3DXVECTOR3(m_pModel[i].nx, m_pModel[i].ny, m_pModel[i].nz);
 
-	vertices[1].position = D3DXVECTOR3(-1.0f, 1.0f, -1.0f);
-	vertices[1].normal = D3DXVECTOR3(-1.0f, 1.0f, -1.0f);
+		indices[i] = i;
+	}
 
-	vertices[2].position = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
-	vertices[2].normal = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
-
-	vertices[3].position = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
-	vertices[3].normal = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
-
-	vertices[4].position = D3DXVECTOR3(-1.0f, -1.0f, 1.0f);
-	vertices[4].normal = D3DXVECTOR3(-1.0f, -1.0f, 1.0f);
-
-	vertices[5].position = D3DXVECTOR3(-1.0f, 1.0f, 1.0f);
-	vertices[5].normal = D3DXVECTOR3(-1.0f, 1.0f, 1.0f);
-
-	vertices[6].position = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	vertices[6].normal = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-
-	vertices[7].position = D3DXVECTOR3(1.0f, -1.0f, 1.0f);
-	vertices[7].normal = D3DXVECTOR3(1.0f, -1.0f, 1.0f);
-
-	// 设置索引缓冲数据.
-
-	indices[0] = 0;  // 前面
-	indices[1] = 1;
-	indices[2] = 2;
-	indices[3] = 0;
-	indices[4] = 2;
-	indices[5] = 3;
-	indices[6] = 4;  // 后面
-	indices[7] = 6;
-	indices[8] = 5;
-	indices[9] = 4;
-	indices[10] = 7;
-	indices[11] = 6;
-	indices[12] = 4;  // 左面
-	indices[13] = 5;
-	indices[14] = 1;
-	indices[15] = 4;
-	indices[16] = 1;
-	indices[17] = 0;
-	indices[18] = 3;  //右面
-	indices[19] = 2;
-	indices[20] = 6;
-	indices[21] = 3;
-	indices[22] = 6;
-	indices[23] = 7;
-	indices[24] = 1;  // 上面
-	indices[25] = 5;
-	indices[26] = 6;
-	indices[27] = 1;
-	indices[28] = 6;
-	indices[29] = 2;
-	indices[30] = 4; // 下面
-	indices[31] = 0;
-	indices[32] = 3;
-	indices[33] = 4;
-	indices[34] = 3;
-	indices[35] = 7;
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_iVertexCount;

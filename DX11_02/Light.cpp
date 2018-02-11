@@ -54,7 +54,7 @@ void Light::SetShininess(float shininess)
 //得到光源位置
 D3DXVECTOR4 Light::GetPosition()
 {
-	return m_vDirection;
+	return m_vPosition;
 }
 
 //得到全局环境光系数

@@ -116,26 +116,26 @@ bool EngineManager::Frame()
 
 	////如果A,S,D,W,Q,E,Z,X,C键按下，移动摄像机
 	if (GetAsyncKeyState('W') & 0x8000)
-		m_pGraphics->m_pCameraEx->walk(-0.1);
+		m_pGraphics->m_pCameraEx->walk(-0.1f);
 	if (GetAsyncKeyState('S') & 0x8000)
-		m_pGraphics->m_pCameraEx->walk(0.1);
+		m_pGraphics->m_pCameraEx->walk(0.1f);
 
 	if (GetAsyncKeyState('A') & 0x8000)
-		m_pGraphics->m_pCameraEx->strafe(-0.1);
+		m_pGraphics->m_pCameraEx->strafe(-0.1f);
 	if (GetAsyncKeyState('D') & 0x8000)
-		m_pGraphics->m_pCameraEx->strafe(0.1);
+		m_pGraphics->m_pCameraEx->strafe(0.1f);
 
 	if (GetAsyncKeyState('Q') & 0x8000)
-		m_pGraphics->m_pCameraEx->fly(-0.1);
+		m_pGraphics->m_pCameraEx->fly(-0.1f);
 	if (GetAsyncKeyState('E') & 0x8000)
-		m_pGraphics->m_pCameraEx->fly(0.1);
+		m_pGraphics->m_pCameraEx->fly(0.1f);
 
 	if (GetAsyncKeyState('Z') & 0x8000)
-		m_pGraphics->m_pCameraEx->pitch(D3DX_PI/180);
+		m_pGraphics->m_pCameraEx->pitch((float)(D3DX_PI/180));
 	if (GetAsyncKeyState('X') & 0x8000)
-		m_pGraphics->m_pCameraEx->yaw(D3DX_PI/180);
+		m_pGraphics->m_pCameraEx->yaw((float)(D3DX_PI/180));
 	if (GetAsyncKeyState('C') & 0x8000)
-		m_pGraphics->m_pCameraEx->roll(D3DX_PI / 180);
+		m_pGraphics->m_pCameraEx->roll((float)(D3DX_PI / 180));
 	if (GetAsyncKeyState('R') & 0x8000)
 	{
 		m_pGraphics->m_pCameraEx->Reset();
