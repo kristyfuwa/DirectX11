@@ -232,10 +232,11 @@ bool Graphics::Render()
 
 	D3DXVECTOR3 cameraPos;
 	D3DXVECTOR4 realCameraPos;
-	D3DXVECTOR4 Ke = D3DXVECTOR4(0.8f, 0.0f,0.2f, 1.0f);
-	D3DXVECTOR4 Ka = D3DXVECTOR4(0.2f, 0.2f, 0.2f, 1.0f);
-	D3DXVECTOR4 Kd = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
-	D3DXVECTOR4 Ks = D3DXVECTOR4(1.0f, 1.0f,1.0f, 1.0f);
+
+	D3DXVECTOR4 Ke = D3DXVECTOR4(0.8, 0.0, 0.2, 1.0);
+	D3DXVECTOR4 Ka = D3DXVECTOR4(0.2, 0.2, 0.2, 1.0);
+	D3DXVECTOR4 Kd = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
+	D3DXVECTOR4 Ks = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
 	m_pCameraEx->getPosition(&cameraPos);
 	realCameraPos = D3DXVECTOR4(cameraPos.x, cameraPos.y, cameraPos.z, 1.0);
 
@@ -245,11 +246,10 @@ bool Graphics::Render()
 		realCameraPos , Ke, Ka, Kd, Ks, m_pLight->GetDirection(), m_pLight->GetShininess());
 	if (!result)
 		return false;
-
-	Ke = D3DXVECTOR4(0.2f, 0.8f, 0.0f, 1.0f);
-	Ka = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f);
-	Kd = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
-	Ks = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
+	Ke = D3DXVECTOR4(0.2, 0.8, 0.0, 1.0);
+	Ka = D3DXVECTOR4(0.3, 0.3, 0.3, 1.0);
+	Kd = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
+	Ks = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
 
 	m_pPlaneModel->Render(m_pD3D->GetDeviceContext());
 	result = m_pLightShader->Render(m_pD3D->GetDeviceContext(), m_pPlaneModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_pLight->GetPosition(), m_pLight->GetLightColor(), m_pLight->GetGlobalAmbient(),

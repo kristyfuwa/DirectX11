@@ -156,11 +156,6 @@ bool CubeModel::InitializeBuffers(ID3D11Device* device)
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 
-	//创建2个临时缓冲存放顶点和索引缓冲
-
-	m_iVertexCount = 8;
-	m_iIndexCount = 36;
-
 	vertices = new VertexType[m_iVertexCount];
 	if (!vertices)
 	{

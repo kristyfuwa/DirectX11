@@ -73,7 +73,7 @@ PixelInputType LightVertexShader(VertexInputType input)
 		specularLight = 0;
 	float4 specular = Ks * lightColor * specularLight;
 
-	output.color.xyz = emissive + ambient + diffuse + specular;
+	output.color = emissive + ambient + diffuse + specular;
 
 	return output;
 }
