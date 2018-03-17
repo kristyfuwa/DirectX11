@@ -346,11 +346,14 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	// 解锁常量缓冲
 	deviceContext->Unmap(m_pLightMaterialBuffer, 0);
 
-	// 设置缓冲索引为1，因为这是vs中的第二个常量缓冲，第一个为矩阵.
-	bufferNumber = 1;
+	//// 设置缓冲索引为1，因为这是vs中的第二个常量缓冲，第一个为矩阵.
+	//bufferNumber = 1
+
+	//设置缓冲索引为0，因为这是ps中的第一个常量缓冲.
+	bufferNumber = 0;
 
 	// 设置光照材质常量缓冲.
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_pLightMaterialBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_pLightMaterialBuffer);
 
 	return true;
 }

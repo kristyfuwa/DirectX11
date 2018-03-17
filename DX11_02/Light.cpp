@@ -2,9 +2,9 @@
 
 Light::Light(void)
 {
-	m_vPosition = D3DXVECTOR4(1.0, 8.0, 1.0,1.0);
+	m_vPosition = D3DXVECTOR4(5.0, 5.0, -3.0,1.0);
 	m_vGlobalAmbient = D3DXVECTOR4(1.0,1.0, 1.0, 1.0);
-	m_vDirection = D3DXVECTOR3(0.0, 0.0,0.0);
+	m_vDirection = D3DXVECTOR3(-1.0, -1.0, 1.0);
 	m_vLightColor = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
 	m_fShininess = 5.0f;
 }
