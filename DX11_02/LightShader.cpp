@@ -1,3 +1,4 @@
+#include "Light.h"
 #include "LightShader.h"
 
 LightShader::LightShader(void)
@@ -42,13 +43,12 @@ void LightShader::Shutdown()
 }
 
 bool LightShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-	D3DXMATRIX projectionMatrix, D3DXVECTOR4 lightPosition, D3DXVECTOR4 lightColor, D3DXVECTOR4 globalAmbient,
-	D3DXVECTOR4 cameraPosition, D3DXVECTOR4 Ke, D3DXVECTOR4 Ka, D3DXVECTOR4 Kd, D3DXVECTOR4 Ks, D3DXVECTOR3 lightDirection, float shininess)
+	D3DXMATRIX projectionMatrix, D3DXVECTOR4 cameraPosition)
 {
 	bool result;
 
 	// 设置shader参数.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix,lightPosition,lightColor,globalAmbient,cameraPosition,Ke,Ka,Kd,Ks,lightDirection,shininess);
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix,cameraPosition);
 	if (!result)
 	{
 		HR(result);
@@ -283,8 +283,7 @@ void LightShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, 
 }
 
 bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-	D3DXMATRIX projectionMatrix, D3DXVECTOR4 lightPosition, D3DXVECTOR4 lightColor, D3DXVECTOR4 globalAmbient,
-	D3DXVECTOR4 cameraPosition, D3DXVECTOR4 Ke, D3DXVECTOR4 Ka, D3DXVECTOR4 Kd, D3DXVECTOR4 Ks, D3DXVECTOR3 lightDirection, float shininess)
+	D3DXMATRIX projectionMatrix,D3DXVECTOR4 cameraPosition)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -332,22 +331,48 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	//得到常量缓冲数据指针
 	dataPtr2 = (LightMaterialBufferType*)mappedResource.pData;
 
-	// 常量缓冲赋值.
-	dataPtr2->lightPosition = lightPosition;
-	dataPtr2->lightColor = lightColor;
-	dataPtr2->globalAmbient = globalAmbient;
-	dataPtr2->Ka = Ka;
-	dataPtr2->Ke = Ke;
-	dataPtr2->Ks = Ks;
-	dataPtr2->Kd = Kd;
-	dataPtr2->cameraPosition = cameraPosition;
-	dataPtr2->lightDirection = lightDirection;
-	dataPtr2->shininess = shininess;
+	D3DXVECTOR4 Ke[NUM_LIGHTS];
+	D3DXVECTOR4 Ka[NUM_LIGHTS];
+	D3DXVECTOR4 Kd[NUM_LIGHTS];
+	D3DXVECTOR4 Ks[NUM_LIGHTS];
+
+	Ke[0] = D3DXVECTOR4(0.2, 0.2, 0.0, 1.0);
+	Ka[0] = D3DXVECTOR4(0.0, 0.0, 0.0, 1.0);
+	Kd[0] = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
+	Ks[0] = D3DXVECTOR4(0.2, 0.2, 0.2, 1.0);
+
+	Ke[1] = D3DXVECTOR4(0.0, 0.0, 0.0, 1.0);
+	Ka[1] = D3DXVECTOR4(0.0, 0.0, 0.0, 1.0);
+	Kd[1] = D3DXVECTOR4(0.5, 0.5, 0.5, 1.0);
+	Ks[1] = D3DXVECTOR4(0.1, 0.1, 0.1, 1.0);
+
+	Light light[NUM_LIGHTS];
+	light[0].SetLightPosition(5.0, 5.0, -3.0, 1.0);
+	light[1].SetLightPosition(-8.0, -4.0, 5.0, 1.0);
+	light[0].SetLightColor(1.0, 1.0, 1.0, 1.0);
+	light[1].SetLightColor(1.0, 1.0, 1.0, 1.0);
+
+	for (int i = 0; i < NUM_LIGHTS; ++i)
+	{
+		// 常量缓冲赋值.
+		dataPtr2->lightPosition[i] = light[i].GetPosition();
+		dataPtr2->lightColor[i] = light[i].GetLightColor();
+		dataPtr2->globalAmbient[i] = light[i].GetGlobalAmbient();
+		dataPtr2->Ka[i] = Ka[i];
+		dataPtr2->Ke[i] = Ke[i];
+		dataPtr2->Ks[i] = Ks[i];
+		dataPtr2->Kd[i] = Kd[i];
+		dataPtr2->cameraPosition = cameraPosition;
+		dataPtr2->lightDirection[i] = light[i].GetDirection();
+		dataPtr2->shininess[i] = light[i].GetShininess();
+	}
+
+
 	// 解锁常量缓冲
 	deviceContext->Unmap(m_pLightMaterialBuffer, 0);
 
 	//// 设置缓冲索引为1，因为这是vs中的第二个常量缓冲，第一个为矩阵.
-	//bufferNumber = 1
+	//bufferNumber = 1;
 
 	//设置缓冲索引为0，因为这是ps中的第一个常量缓冲.
 	bufferNumber = 0;

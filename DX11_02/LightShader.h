@@ -20,16 +20,16 @@ private:
 
 	struct LightMaterialBufferType
 	{
-		D3DXVECTOR4 lightPosition;
-		D3DXVECTOR4 lightColor;
-		D3DXVECTOR4 globalAmbient;
+		D3DXVECTOR4 lightPosition[NUM_LIGHTS];
+		D3DXVECTOR4 lightColor[NUM_LIGHTS];
+		D3DXVECTOR4 globalAmbient[NUM_LIGHTS];
 		D3DXVECTOR4 cameraPosition;
-		D3DXVECTOR4 Ke;
-		D3DXVECTOR4 Ka;
-		D3DXVECTOR4 Kd;
-		D3DXVECTOR4 Ks;
-		D3DXVECTOR3 lightDirection;
-		float		shininess;
+		D3DXVECTOR4 Ke[NUM_LIGHTS];
+		D3DXVECTOR4 Ka[NUM_LIGHTS];
+		D3DXVECTOR4 Kd[NUM_LIGHTS];
+		D3DXVECTOR4 Ks[NUM_LIGHTS];
+		D3DXVECTOR3 lightDirection[NUM_LIGHTS];
+		float		shininess[NUM_LIGHTS];
 	};
 
 public:
@@ -39,8 +39,7 @@ public:
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4,
-		D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, float);
+	bool Render(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXVECTOR4);
 
 
 private:
@@ -48,8 +47,7 @@ private:
 	void ShutdownShader();
 	void OutputShaderErrorMessage(ID3D10Blob*, HWND, WCHAR*);
 
-	bool SetShaderParameters(ID3D11DeviceContext*, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4,
-		D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, float);
+	bool SetShaderParameters(ID3D11DeviceContext*, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXVECTOR4);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 	ID3D11VertexShader*		m_pVertexShader;

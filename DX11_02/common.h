@@ -50,6 +50,7 @@ VS中自带了内存泄露检测工具，若要启用内存泄露检测，则在程序中包括以下语句：
 #endif
 
 
+#define NUM_LIGHTS 2
 
 
 const D3DXVECTOR4 WHITE(1.0f, 1.0f, 1.0f, 1.0f);

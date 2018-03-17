@@ -7,7 +7,6 @@
 #include "ColorShader.h"
 #include "CubeModel.h"
 #include "AxisModel.h"
-#include "Light.h"
 #include "LightShader.h"
 #include "PlaneModel.h"
 /////////////
@@ -44,7 +43,6 @@ private:
 	CubeModel*		m_pCubeModel;
 	ColorShader*	m_pColorShader;
 	PlaneModel*		m_pPlaneModel;
-	Light*			m_pLight;
 	LightShader*	m_pLightShader;
 };
 
