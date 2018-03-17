@@ -29,6 +29,7 @@ private:
 		D3DXVECTOR4 Kd[NUM_LIGHTS];
 		D3DXVECTOR4 Ks[NUM_LIGHTS];
 		D3DXVECTOR4 attenuation[NUM_LIGHTS];
+		D3DXVECTOR4 spotattenuation[NUM_LIGHTS];
 		D3DXVECTOR3 lightDirection[NUM_LIGHTS];
 		float		shininess[NUM_LIGHTS];
 	};

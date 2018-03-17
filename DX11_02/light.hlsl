@@ -18,7 +18,8 @@ cbuffer LightMaterialBuffer
 	float4 Kd[NUM_LIGHTS];  //材质的漫反射系数
 	float4 Ks[NUM_LIGHTS];  //材质的高光系数
 	float4 attenuation[NUM_LIGHTS]; //衰减系数
-	float3 lightDirection[NUM_LIGHTS]; //平行光方向
+	float4 spotattenuation[NUM_LIGHTS];
+	float3 lightDirection[NUM_LIGHTS]; //平行光方向,或者spotlight下光的方向
 	float shininess[NUM_LIGHTS]; //高光指数
 }
 
@@ -92,6 +93,17 @@ struct PixelInputType
 //	return input.color;
 //}
 
+//一个计算spot light系数的函数
+float dualConeSpotlight(float3 P, float3 lightpos, float3 lightdir, float  cosInnerCone, float cosOuterCone)
+{
+
+	float3 V = normalize(P - lightpos);
+
+	float cosDirection = dot(V, normalize(lightdir));
+
+	return smoothstep(cosOuterCone, cosInnerCone, cosDirection);
+}
+
 
 PixelInputType LightVertexShader(VertexInputType input)
 {
@@ -132,6 +144,7 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 	float3 H = 0;
 	float specularLight = 0;
 	float4 specular = 0;
+	float spotEffect;
 	float atte;
 	float d;
 	int		i;
@@ -146,7 +159,9 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 
 
 		//计算漫反射
-		//用LightDirection就是纯平行光
+		//用LightDirection就是纯平行光,在spotlight情况下代表光的方向
+		spotEffect = dualConeSpotlight(P, lightPosition[i].xyz, lightDirection[i], spotattenuation[i].x, spotattenuation[i].y);
+
 		//光源位置减顶点位置
 		L = normalize(lightPosition[i].xyz - P);
 		d = distance(lightPosition[i].xyz, P);
@@ -154,7 +169,7 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 		//衰减系数
 		atte = 1 / (attenuation[i].x + attenuation[i].y*d + attenuation[i].z * d * d);
 		diffuseLight = max(dot(N, L), 0);
-		diffuse = Kd[i] * lightColor[i] * diffuseLight * atte;
+		diffuse = Kd[i] * lightColor[i] * diffuseLight * atte * spotEffect;
 
 		//计算高光
 		V = normalize(cameraPosition.xyz - P);
@@ -163,7 +178,7 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 
 		if (diffuseLight <= 0)
 			specularLight = 0;
-		specular = Ks[i] * lightColor[i] * specularLight * atte;
+		specular = Ks[i] * lightColor[i] * specularLight * atte * spotEffect;
 		finalcolor += emissive + ambient + diffuse + specular;
 	}
 	return finalcolor;

@@ -336,6 +336,7 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	D3DXVECTOR4 Kd[NUM_LIGHTS];
 	D3DXVECTOR4 Ks[NUM_LIGHTS];
 	D3DXVECTOR4 attenuation[NUM_LIGHTS];
+	D3DXVECTOR4 spotattenuation[NUM_LIGHTS];
 
 	Ke[0] = D3DXVECTOR4(0.2, 0.2, 0.0, 1.0);
 	Ka[0] = D3DXVECTOR4(0.0, 0.0, 0.0, 1.0);
@@ -350,6 +351,11 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 	attenuation[0] = D3DXVECTOR4(1.0, 0.1, 0.01, 1.0);
 	attenuation[1] = D3DXVECTOR4(1.0, 0.2, 0.02, 1.0);
 
+	spotattenuation[0] = D3DXVECTOR4(0.9, 0.8, 0.0, 1.0);
+	spotattenuation[1] = D3DXVECTOR4(1.0, 0.0, 0.0, 1.0);
+
+
+
 	Light light[NUM_LIGHTS];
 	light[0].SetLightPosition(5.0, 5.0, -3.0, 1.0);
 	light[1].SetLightPosition(-8.0, -4.0, 5.0, 1.0);
@@ -361,15 +367,16 @@ bool LightShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMA
 		// ³£Á¿»º³å¸³Öµ.
 		dataPtr2->lightPosition[i] = light[i].GetPosition();
 		dataPtr2->lightColor[i] = light[i].GetLightColor();
+		dataPtr2->cameraPosition = cameraPosition;
 		dataPtr2->globalAmbient[i] = light[i].GetGlobalAmbient();
 		dataPtr2->Ka[i] = Ka[i];
 		dataPtr2->Ke[i] = Ke[i];
 		dataPtr2->Ks[i] = Ks[i];
 		dataPtr2->Kd[i] = Kd[i];
-		dataPtr2->attenuation[i] = attenuation[i];
-		dataPtr2->cameraPosition = cameraPosition;
 		dataPtr2->lightDirection[i] = light[i].GetDirection();
 		dataPtr2->shininess[i] = light[i].GetShininess();
+		dataPtr2->attenuation[i] = attenuation[i];
+		dataPtr2->spotattenuation[i] = spotattenuation[i];
 	}
 
 
