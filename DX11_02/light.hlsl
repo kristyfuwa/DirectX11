@@ -17,6 +17,7 @@ cbuffer LightMaterialBuffer
 	float4 Ka[NUM_LIGHTS];  //材质的环境光系数
 	float4 Kd[NUM_LIGHTS];  //材质的漫反射系数
 	float4 Ks[NUM_LIGHTS];  //材质的高光系数
+	float4 attenuation[NUM_LIGHTS]; //衰减系数
 	float3 lightDirection[NUM_LIGHTS]; //平行光方向
 	float shininess[NUM_LIGHTS]; //高光指数
 }
@@ -131,6 +132,8 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 	float3 H = 0;
 	float specularLight = 0;
 	float4 specular = 0;
+	float atte;
+	float d;
 	int		i;
 
 	for (i = 0; i < NUM_LIGHTS; ++i)
@@ -141,22 +144,26 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 		//计算环境光
 		ambient = Ka[i] * globalAmbient[i];
 
-		//用LightDirection就是纯平行光
-		//光源位置减顶点位置，是不考虑衰减的点光源
 
 		//计算漫反射
-		float3 L = normalize(lightPosition[i].xyz - P);
-		float n_dot_l = max(dot(N, L), 0);
-		float4 diffuse = Kd[i] * lightColor[i] * n_dot_l;
+		//用LightDirection就是纯平行光
+		//光源位置减顶点位置
+		L = normalize(lightPosition[i].xyz - P);
+		d = distance(lightPosition[i].xyz, P);
+
+		//衰减系数
+		atte = 1 / (attenuation[i].x + attenuation[i].y*d + attenuation[i].z * d * d);
+		diffuseLight = max(dot(N, L), 0);
+		diffuse = Kd[i] * lightColor[i] * diffuseLight * atte;
 
 		//计算高光
-		float3 V = normalize(cameraPosition.xyz - P);
-		float3 H = normalize(L + V);
-		float specularLight = pow(max(dot(N, H), 0), shininess[i]);
+		V = normalize(cameraPosition.xyz - P);
+		H = normalize(L + V);
+		specularLight = pow(max(dot(N, H), 0), shininess[i]);
 
-		if (n_dot_l <= 0)
+		if (diffuseLight <= 0)
 			specularLight = 0;
-		float4 specular = Ks[i] * lightColor[i] * specularLight;
+		specular = Ks[i] * lightColor[i] * specularLight * atte;
 		finalcolor += emissive + ambient + diffuse + specular;
 	}
 	return finalcolor;
