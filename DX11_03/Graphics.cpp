@@ -43,7 +43,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 		return false;
 	}
 
-	m_pCameraEx = new CameraEx();
+	m_pCameraEx = new Camera();
 	if (!m_pCameraEx)
 		return false;
 	

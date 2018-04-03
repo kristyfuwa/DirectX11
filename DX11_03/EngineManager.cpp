@@ -28,7 +28,7 @@ bool EngineManager::Initialize()
 	m_pInput = new Input;
 	if (!m_pInput)
 		return false;
-	m_pInput->Initialize();
+	m_pInput->initialize();
 
 	m_pGraphics = new Graphics;
 	if (!m_pGraphics)
@@ -109,7 +109,7 @@ void EngineManager::Run()
 bool EngineManager::Frame()
 {
 	bool result;
-	if (m_pInput->IsKeyDown(VK_ESCAPE))
+	if (m_pInput->isKeyDown(VK_ESCAPE))
 	{
 		return false;
 	}
@@ -138,7 +138,7 @@ bool EngineManager::Frame()
 		m_pGraphics->m_pCameraEx->roll((float)(D3DX_PI / 180));
 	if (GetAsyncKeyState('R') & 0x8000)
 	{
-		m_pGraphics->m_pCameraEx->Reset();
+		m_pGraphics->m_pCameraEx->reset();
 		D3DXVECTOR3 campos = D3DXVECTOR3(0.0f, 0.0f, -10.0f);
 		m_pGraphics->m_pCameraEx->setPosition(&campos);
 	}
@@ -276,12 +276,12 @@ LRESULT	CALLBACK EngineManager::MessageHandler(HWND hwnd, UINT umsg, WPARAM wpar
 		// ¼ì²â°´¼üÏûÏ¢.
 	case WM_KEYDOWN:
 	{
-		m_pInput->KeyDown((unsigned int)wparam);
+		m_pInput->keyDown((unsigned int)wparam);
 		return 0;
 	}
 	case WM_KEYUP:
 	{
-		m_pInput->KeyUp((unsigned int)wparam);
+		m_pInput->keyUp((unsigned int)wparam);
 		return 0;
 	}
 	case WM_SIZE:

@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <cstdlib>
 #include "D3D.h"
-#include "CameraEx.h"
+#include "Camera.h"
 #include "Model.h"
 #include "ColorShader.h"
 #include "CubeModel.h"
@@ -31,7 +31,7 @@ public:
 	bool	Frame();
 
 public:
-	CameraEx*			m_pCameraEx;
+	Camera*			m_pCameraEx;
 private:
 	bool	Render();
 

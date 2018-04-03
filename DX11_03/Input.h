@@ -3,17 +3,15 @@ class Input
 {
 public:
 	Input();
-	Input(const Input&);
 	~Input();
 
-	void Initialize();
+	void initialize();
+	void keyDown(unsigned int);
+	void keyUp(unsigned int);
 
-	void KeyDown(unsigned int key);
-	void KeyUp(unsigned int key);
-
-	bool IsKeyDown(unsigned int key);
+	bool isKeyDown(unsigned int);
 
 private:
-	bool		m_keys[256];
+	bool			m_keys[256];
 };
 

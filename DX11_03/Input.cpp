@@ -7,39 +7,30 @@ Input::Input()
 }
 
 
-Input::Input(const Input&)
-{
-
-}
-
 Input::~Input()
 {
 }
 
-void Input::Initialize()
+void Input::initialize()
 {
-	int i;
-
-	for (i = 0; i < 256; ++i)
+	for (size_t i = 0; i < 256; ++i)
 	{
-		m_keys[i] = false;
+		m_keys[i] = 0;
 	}
-	return;
 }
 
-void Input::KeyDown(unsigned int key)
+void Input::keyDown(unsigned int key)
 {
-	m_keys[key] = true;
-	return;
+	m_keys[key] = 1;
 }
 
-void Input::KeyUp(unsigned int key)
+void Input::keyUp(unsigned int key)
 {
-	m_keys[key] = false;
-	return;
+	m_keys[key] = 0;
 }
 
-bool Input::IsKeyDown(unsigned int key)
+bool Input::isKeyDown(unsigned int i)
 {
-	return m_keys[key];
+	return m_keys[i];
 }
+
