@@ -8,28 +8,27 @@ class Model
 private:
 	struct VertexType
 	{
-		D3DXVECTOR3 position;
+		D3DXVECTOR3	position;
 		D3DXVECTOR4 color;
 	};
 public:
+
 	Model();
-	Model(const Model&);
 	~Model();
-	
-	bool Initialize(ID3D11Device*);
-	void Shutdown();
-	void Render(ID3D11DeviceContext*);
-	int	 GetIndexCount();
+
+	bool initialize(ID3D11Device* device);
+	void shutDown();
+	void render(ID3D11DeviceContext* context);
+
+	int getIndexCount();
 private:
-	bool InitializeBuffers(ID3D11Device*);
-	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	bool initializeBuffers(ID3D11Device* device);
+	void shutDownBuffers();
+	void renderBuffers(ID3D11DeviceContext* context);
 
-	//¶¥µã»º³åºÍ¶¥µãË÷Òý»º³å
-
-	ID3D11Buffer*	m_pVertexBuffer;
-	ID3D11Buffer*	m_pIndexBuffer;
-	int				m_iVertexCount;
-	int				m_iIndexCount;
+	ID3D11Buffer*			m_pVertexBuffer;
+	ID3D11Buffer*			m_pIndexBuffer;
+	int						m_iVertexCount;
+	int						m_iIndexCount;
 };
 

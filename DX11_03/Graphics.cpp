@@ -54,7 +54,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hWnd)
 	m_pModel = new Model();
 	if (!m_pModel)
 		return false;
-	result = m_pModel->Initialize(m_pD3D->GetDevice());
+	result = m_pModel->initialize(m_pD3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hWnd, L"Could not initialize the model object", L"Error", MB_OK);
@@ -132,7 +132,7 @@ void Graphics::Shutdown()
 
 	if (m_pModel)
 	{
-		m_pModel->Shutdown();
+		m_pModel->shutDown();
 		delete m_pModel;
 		m_pModel = 0;
 	}
@@ -214,8 +214,8 @@ bool Graphics::Render()
 		return false;
 
 	//把模型顶点和索引顶点放入管线，准备渲染
-	m_pModel->Render(m_pD3D->GetDeviceContext());
-	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(), m_pModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_pModel->render(m_pD3D->GetDeviceContext());
+	result = m_pColorShader->Render(m_pD3D->GetDeviceContext(), m_pModel->getIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
