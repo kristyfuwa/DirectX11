@@ -21,9 +21,6 @@
     <ClCompile Include="ColorShader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CubeModel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="D3D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -48,13 +45,16 @@
     <ClCompile Include="Model.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="PlaneModel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Planel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,9 +66,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="common.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeModel.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="D3D.h">
@@ -92,13 +89,16 @@
     <ClInclude Include="Model.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PlaneModel.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

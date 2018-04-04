@@ -1,8 +1,5 @@
 #include "ColorShader.h"
 
-
-
-
 ColorShader::ColorShader()
 {
 	m_pLayout = 0;
@@ -11,33 +8,134 @@ ColorShader::ColorShader()
 	m_pPixelShader = 0;
 }
 
-ColorShader::ColorShader(const ColorShader& other)
-{
-
-}
-
 ColorShader::~ColorShader()
 {
 
 }
 
-bool ColorShader::Initialize(ID3D11Device* device, HWND hwnd)
+bool ColorShader::initialize(ID3D11Device* device, HWND hwnd)
 {
 	bool result;
-	//初始化vs,ps
-	result = InitializeShader(device, hwnd, L"color.hlsl", L"color.hlsl");
+
+	result = initializeShader(device, hwnd, L"color.hlsl", L"color.hlsl");
 	if (!result)
 		return false;
-	return true;
-
 }
 
-void ColorShader::Shutdown()
+bool ColorShader::initializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFileName, WCHAR* psFileName)
 {
-	ShutdownShader();
+	HRESULT result;
+	ID3D10Blob*	errorMessage;
+	ID3D10Blob* vsBlob;
+	ID3D10Blob* psBlob;
+	D3D11_INPUT_ELEMENT_DESC layout[2];
+	unsigned int numElements;
+	D3D11_BUFFER_DESC matrixBufferDesc;
+	DWORD shaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
+
+#if defined(DEBUG) || defined(_DEBUG)
+	shaderFlags |= D3D10_SHADER_DEBUG;
+#endif
+
+	errorMessage = nullptr;
+	vsBlob = nullptr;
+	psBlob = nullptr;
+
+	result = D3DX11CompileFromFile(vsFileName, nullptr, nullptr, "ColorVertexShader", "vs_5_0",
+		shaderFlags, 0, nullptr, &vsBlob, &errorMessage, nullptr);
+	if (FAILED(result))
+	{
+		if (errorMessage)
+		{
+			outputShaderErrorMessage(errorMessage, hwnd, vsFileName);
+		}
+		else
+
+		{
+			MessageBox(hwnd, vsFileName, L"missing shader file", MB_OK);
+		}
+		HR(result);
+		return false;
+	}
+
+	result = D3DX11CompileFromFile(psFileName, nullptr, nullptr, "ColorPixelShader", "ps_5_0",
+		shaderFlags, 0, nullptr, &psBlob, &errorMessage, nullptr);
+	if (FAILED(result))
+	{
+		if (errorMessage)
+		{
+			outputShaderErrorMessage(errorMessage, hwnd, psFileName);
+		}
+		else
+		{
+			MessageBox(hwnd, psFileName, L"miss shader file", MB_OK);
+		}
+		HR(result);
+		return false;
+	}
+
+	result = device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_pVertexShader);
+	if (FAILED(result))
+	{
+		HR(result);
+		return false;
+	}
+	result = device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pPixelShader);
+	if (FAILED(result))
+	{
+		HR(result);
+		return false;
+	}
+
+	layout[0].SemanticName = "POSITION";
+	layout[0].SemanticIndex = 0;
+	layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	layout[0].InputSlot = 0;
+	layout[0].AlignedByteOffset = 0;
+	layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	layout[0].InstanceDataStepRate = 0;
+		   
+	layout[1].SemanticName = "COLOR";
+	layout[1].SemanticIndex = 0;
+	layout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	layout[1].InputSlot = 0;
+	layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;//12是对齐字节位移，前一个元素是D3DXVECTOR3，大小3 * sizeof(D3DXVECTOR3) = 12，为了方便可用D3D11_APPEND_ALIGNED_ELEMENT可以代替12  
+	layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	layout[1].InstanceDataStepRate = 0;
+
+	numElements = sizeof(layout) / sizeof(layout[0]);
+	result = device->CreateInputLayout(layout, numElements, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_pLayout);
+	if (FAILED(result))
+	{
+		HR(result);
+		return false;
+	}
+
+	//release buffer
+	vsBlob->Release();
+	vsBlob = 0;
+	psBlob->Release();
+	psBlob = 0;
+	
+	//set dynamic matrix desc
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
+
+	result = device->CreateBuffer(&matrixBufferDesc, nullptr, &m_pMatrixBuffer);
+	if (FAILED(result))
+	{
+		HR(result);
+		return false;
+	}
+
+	return true;
 }
 
-void ColorShader::ShutdownShader()
+void ColorShader::shutDownShader()
 {
 	// 释放常量缓冲
 	if (m_pMatrixBuffer)
@@ -66,227 +164,91 @@ void ColorShader::ShutdownShader()
 	}
 }
 
-void ColorShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
+void ColorShader::outputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
 {
-	char* compileErrors;
+	char* compileError;
 	unsigned long bufferSize, i;
 	ofstream fout;
 
-	//得到错误信息buffer指针
-	compileErrors = (char*)errorMessage->GetBufferPointer();
-
-	//得到buffer的长度
+	compileError = (char*)errorMessage->GetBufferPointer();
 	bufferSize = errorMessage->GetBufferSize();
 
-	//打开一个文件写错误信息
 	fout.open("shader-error.txt");
-
-	//输出错误信息
 	for (i = 0; i < bufferSize; ++i)
 	{
-		fout << compileErrors[i];
+		fout << compileError[i];
 	}
-	//释放错误信息，关闭文件，弹出错误提示
 
 	fout.close();
+
 	errorMessage->Release();
 	errorMessage = 0;
-	MessageBox(hwnd, L"error compiling shader,Check shader-error.tex for message.", shaderFilename, MB_OK);
+
+	MessageBox(hwnd, L"Error compiling shader,check shader-error.txt for message", shaderFilename, MB_OK);
+}
+
+bool ColorShader::setShaderParameters(ID3D11DeviceContext* context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj)
+{
+	HRESULT result;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	MatrixBufferType* dataPtr;
+	unsigned int bufferNumber;
+
+	// 传入shader前，确保矩阵转置，这是D3D11的要求.
+	D3DXMatrixTranspose(&world, &world);
+	D3DXMatrixTranspose(&view, &view);
+	D3DXMatrixTranspose(&proj, &proj);
+
+	//  锁定常量缓冲，以便能够写入.
+	result = context->Map(m_pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+	{
+		HR(result);
+		return false;
+	}
+	// 得到const buffer指针.
+	dataPtr = (MatrixBufferType*)mappedResource.pData;
+	// 设置world,view以及projection矩阵.
+	dataPtr->world = world;
+	dataPtr->view = view;
+	dataPtr->projection = proj;
+
+	//// 解锁常量缓冲.
+	context->Unmap(m_pMatrixBuffer, 0);
+
+	// 设置常量缓冲位置.
+	bufferNumber = 0;
+	context->VSSetConstantBuffers(bufferNumber, 1, &m_pMatrixBuffer);
+	return true;
 
 }
 
-bool ColorShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectMatrix)
+void ColorShader::renderShader(ID3D11DeviceContext* context, int indexcount)
+{
+	context->IASetInputLayout(m_pLayout);
+
+	context->VSSetShader(m_pVertexShader, nullptr, 0);
+	context->PSSetShader(m_pPixelShader, nullptr, 0);
+
+	context->DrawIndexed(indexcount, 0, 0);
+}
+
+void ColorShader::shutDown()
+{
+	shutDownShader();
+}
+
+bool ColorShader::render(ID3D11DeviceContext* context, int indexcount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj)
 {
 	bool result;
 
-	//设置shader参数
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectMatrix);
+	result = setShaderParameters(context, world, view, proj);
 	if (!result)
 	{
 		HR(result);
 		return false;
 	}
-		
 
-	//用shader渲染指定缓冲顶点
-	RenderShader(deviceContext, indexCount);
-	return true;
-}
-
-bool ColorShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectMatrix)
-{
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType*	dataPtr;
-	unsigned int bufferNumber;
-
-	//传入shader前，确保矩阵转置，这是D3D11要求
-	D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
-	D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
-	D3DXMatrixTranspose(&projectMatrix, &projectMatrix);
-
-	//锁定常量缓冲，以便能够写入
-	result = deviceContext->Map(m_pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-	{
-		HR(result);
-		return false;
-	}
-
-	//得到const buffer指针
-	dataPtr = (MatrixBufferType*)mappedResource.pData;
-
-	//设置world，view，projection矩阵
-	dataPtr->world = worldMatrix;
-	dataPtr->view = viewMatrix;
-	dataPtr->projection = projectMatrix;
-
-	//解锁常量缓冲.
-	deviceContext->Unmap(m_pMatrixBuffer, 0);
-
-	//设置常量缓冲的位置
-	bufferNumber = 0;
-
-	//用更新后的值设置常量缓冲.
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_pMatrixBuffer);
-
-	return true;
-
-}
-
-void ColorShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
-{
-	//绑定顶点布局。
-	deviceContext->IASetInputLayout(m_pLayout);
-
-	//设置渲染使用VS和PS
-	deviceContext->VSSetShader(m_pVertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pPixelShader, NULL, 0);
-
-	//渲染三角形
-	deviceContext->DrawIndexed(indexCount, 0, 0);
-}
-
-bool ColorShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFileName, WCHAR* psFileName)
-{
-	HRESULT result;
-	ID3D10Blob* errorMessage;
-	ID3D10Blob* vertexShaderBuffer;
-	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
-	unsigned int numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc;
-	DWORD shaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
-
-#if defined(DEBUG) || defined(_DEBUG)
-	shaderFlags |= D3D10_SHADER_DEBUG;
-#endif
-
-
-	//初始化指针为空
-	errorMessage = 0;
-	vertexShaderBuffer = 0;
-	pixelShaderBuffer = 0;
-
-	//编译VS代码
-	result = D3DX11CompileFromFile(vsFileName, NULL, NULL, "ColorVertexShader", "vs_5_0", shaderFlags, 0, NULL, &vertexShaderBuffer, &errorMessage, NULL);
-	if (FAILED(result))
-	{
-		// 如果vs编译失败，输出错误消息.
-		if (errorMessage)
-		{
-			OutputShaderErrorMessage(errorMessage, hwnd, vsFileName);
-		}
-		// 如果没有任何错误消息，可能是shader文件丢失.
-		else
-		{
-			MessageBox(hwnd, vsFileName, L"Missing shader file", MB_OK);
-		}
-		HR(result);
-		return false;
-	}
-
-	//编译ps代码
-	result = D3DX11CompileFromFile(psFileName, NULL, NULL, "ColorPixelShader", "ps_5_0", shaderFlags, 0, NULL, &pixelShaderBuffer, &errorMessage, NULL);
-	if (FAILED(result))
-	{
-		// 如果vs编译失败，输出错误消息.
-		if (errorMessage)
-		{
-			OutputShaderErrorMessage(errorMessage, hwnd, vsFileName);
-		}
-		// 如果没有任何错误消息，可能是shader文件丢失.
-		else
-		{
-			MessageBox(hwnd, psFileName, L"Missing shader file", MB_OK);
-		}
-		HR(result);
-		return false;
-	}
-	if(errorMessage)
-		errorMessage->Release();
-
-
-	//从缓冲创建vs shader,ps shader
-	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_pVertexShader);
-	if (FAILED(result))
-	{
-		HR(result);
-		return false;
-	}
-		
-
-	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pPixelShader);
-	if (FAILED(result))
-	{
-		HR(result);
-		return false;
-	}
-
-
-
-	//设置数据布局，以便在shader中使用
-	//定义要和Model中顶点结构一致；
-	polygonLayout[0] =
-	{
-		"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0,
-	};
-	polygonLayout[1]=
-	{
-		"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0,
-	};
-
-	//得到Layout中元素的数量
-	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
-
-	//创建顶点输入布局
-	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_pLayout);
-	if (FAILED(result))
-	{
-		HR(result);
-		return false;
-	}
-
-
-	vertexShaderBuffer->Release();
-	vertexShaderBuffer = 0;
-	pixelShaderBuffer->Release();
-	pixelShaderBuffer = 0;
-
-	//设置动态矩阵描述
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
-
-	//// 创建const buffer指针，以便访问shader常量.
-	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_pMatrixBuffer);
-	if (FAILED(result))
-	{
-		HR(result);
-		return false;
-	}
+	renderShader(context, indexcount);
 	return true;
 }

@@ -5,10 +5,12 @@
 #include "Camera.h"
 #include "Model.h"
 #include "ColorShader.h"
-#include "CubeModel.h"
+#include "Cube.h"
 #include "AxisModel.h"
 #include "LightShader.h"
-#include "PlaneModel.h"
+#include "Plane.h"
+#include "Light.h"
+#include "common.h"
 /////////////
 // GLOBALS //
 /////////////
@@ -28,21 +30,21 @@ public:
 
 	bool	Initialize(int ,int,HWND);
 	void	Shutdown();
-	bool	Frame();
+	bool	Frame(float dt);
 
 public:
 	Camera*			m_pCameraEx;
 private:
-	bool	Render();
+	bool	Render(float dt);
 
 	//定义一个D3D类成员变量
 	D3D*			m_pD3D;
 
 	Model*			m_pModel;
 	AxisModel*		m_pAxisModel;
-	CubeModel*		m_pCubeModel;
+	Cube*			m_pCube;
 	ColorShader*	m_pColorShader;
-	PlaneModel*		m_pPlaneModel;
+	Plane*			m_pPlane;
 	LightShader*	m_pLightShader;
 };
 

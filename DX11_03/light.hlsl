@@ -7,36 +7,43 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-cbuffer LightMaterialBuffer
+cbuffer LightBuffer
 {
 	float4 lightPosition[NUM_LIGHTS]; //光源位置
 	float4 lightColor[NUM_LIGHTS];   //光源颜色
 	float4 globalAmbient[NUM_LIGHTS]; //光源的环境光反射系数
-	float4 cameraPosition; //摄像机的位置
-	float4 Ke[NUM_LIGHTS];  //材质的自发光
-	float4 Ka[NUM_LIGHTS];  //材质的环境光系数
-	float4 Kd[NUM_LIGHTS];  //材质的漫反射系数
-	float4 Ks[NUM_LIGHTS];  //材质的高光系数
 	float4 attenuation[NUM_LIGHTS]; //衰减系数
 	float4 spotattenuation[NUM_LIGHTS];
 	float3 lightDirection[NUM_LIGHTS]; //平行光方向,或者spotlight下光的方向
 	float shininess[NUM_LIGHTS]; //高光指数
 }
 
+cbuffer MaterialBuffer
+{
+	float4 Ke;
+	float4 Ka;
+};
+cbuffer CameraBuffer
+{
+	float4 cameraPosition;
+};
+
 struct VertexInputType
 {
 	float4	position:POSITION;
 	float3	normal:NORMAL;
+	float4 Kd:DIFFUSE;
+	float4 Ks:SPECULAR;
 };
 
 
 struct PixelInputType
 {
 	float4 position:SV_POSITION;//SV表示系统自定义格式;
-
-	//float4 color:COLOR;
 	float3 worldnormal:NORMAL;
 	float4 worldposition : POSITION;
+	float4 Kd:DIFFUSE;
+	float4 Ks:SPECULAR;
 };
 
 //PixelInputType LightVertexShader(VertexInputType input)
@@ -134,6 +141,10 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 	float3 P = input.worldposition.xyz;
 	float3 N = normalize(input.worldnormal);
 
+	float4 Kd = input.Kd;
+	float4 Ks = input.Ks;
+
+
 	float4 finalcolor = 0;
 	float4 emissive = 0;
 	float4 ambient = 0;
@@ -152,10 +163,10 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 	for (i = 0; i < NUM_LIGHTS; ++i)
 	{
 		//自发光颜色
-		emissive = Ke[i];
+		emissive = Ke;
 
 		//计算环境光
-		ambient = Ka[i] * globalAmbient[i];
+		ambient = Ka * globalAmbient[i];
 
 
 		//计算漫反射
@@ -169,7 +180,7 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 		//衰减系数
 		atte = 1 / (attenuation[i].x + attenuation[i].y*d + attenuation[i].z * d * d);
 		diffuseLight = max(dot(N, L), 0);
-		diffuse = Kd[i] * lightColor[i] * diffuseLight * atte * spotEffect;
+		diffuse = Kd * lightColor[i] * diffuseLight * atte * spotEffect;
 
 		//计算高光
 		V = normalize(cameraPosition.xyz - P);
@@ -178,7 +189,7 @@ float4 LightPixelShader(PixelInputType input) :SV_TARGET
 
 		if (diffuseLight <= 0)
 			specularLight = 0;
-		specular = Ks[i] * lightColor[i] * specularLight * atte * spotEffect;
+		specular = Ks * lightColor[i] * specularLight * atte * spotEffect;
 		finalcolor += emissive + ambient + diffuse + specular;
 	}
 	return finalcolor;

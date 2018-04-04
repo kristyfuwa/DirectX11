@@ -7,6 +7,8 @@ Light::Light(void)
 	m_vDirection = D3DXVECTOR3(-1.0, -1.0, 1.0);
 	m_vLightColor = D3DXVECTOR4(1.0, 1.0, 1.0, 1.0);
 	m_fShininess = 5.0f;
+	m_vAttenuation = D3DXVECTOR4(1.0, 0.0, 0.0, 1.0);
+	m_vSpotLight = D3DXVECTOR4(0.7, 0.6, 0.0, 1.0);
 }
 
 Light::Light(const Light & others)
@@ -44,6 +46,16 @@ void Light::SetLightColor(float red, float green, float blue,float alpha)
 	return;
 }
 
+void Light::SetLightAttenuation(float x, float y, float z, float w)
+{
+	m_vAttenuation = D3DXVECTOR4(x, y, z, w);
+}
+
+void Light::SetLightSpotLight(float x, float y, float z, float w)
+{
+	m_vSpotLight = D3DXVECTOR4(x, y, z, w);
+}
+
 //设置全局环境光系数
 void Light::SetShininess(float shininess)
 {
@@ -73,6 +85,16 @@ D3DXVECTOR3 Light::GetDirection()
 D3DXVECTOR4 Light::GetLightColor()
 {
 	return m_vLightColor;
+}
+
+D3DXVECTOR4 Light::GetLightAttenuation()
+{
+	return m_vAttenuation;
+}
+
+D3DXVECTOR4 Light::GetSpotLight()
+{
+	return m_vSpotLight;
 }
 
 //得到全局环境光系数

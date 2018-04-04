@@ -66,3 +66,26 @@ const D3DXVECTOR4 BEACH_SAND(1.0f, 0.96f, 0.62f, 1.0f);
 const D3DXVECTOR4 LIGHT_YELLOW_GREEN(0.48f, 0.77f, 0.46f, 1.0f);
 const D3DXVECTOR4 DARK_YELLOW_GREEN(0.1f, 0.48f, 0.19f, 1.0f);
 const D3DXVECTOR4 DARKBROWN(0.45f, 0.39f, 0.34f, 1.0f);
+
+
+struct LightBuffer
+{
+	D3DXVECTOR4 lightPosition[NUM_LIGHTS];
+	D3DXVECTOR4 lightColor[NUM_LIGHTS];
+	D3DXVECTOR4 globalAmbient[NUM_LIGHTS];//光源的环境光反射系数
+	D3DXVECTOR4 attenuation[NUM_LIGHTS];//衰减系数，x,y,z对应常量，线性和二次系数
+	D3DXVECTOR4 spotlight[NUM_LIGHTS]; //对于spotlight，x，y分别存储内和外角cos值
+	D3DXVECTOR3 lightDirection[NUM_LIGHTS];//平行光方向
+	float		shininess[NUM_LIGHTS];//高光指数
+};
+
+struct MaterialBuffer
+{
+	D3DXVECTOR4 Ke;//材质自发光
+	D3DXVECTOR4 Ka;//材质环境光系数；
+};
+
+struct CameraBuffer
+{
+	D3DXVECTOR4 cameraPosition;
+};

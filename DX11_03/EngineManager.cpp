@@ -150,7 +150,7 @@ bool EngineManager::Frame()
 	//m_pGraphics->m_pCameraEx->roll(m_pTimer->GetTime() / 1000);
 
 
-	result = m_pGraphics->Frame();
+	result = m_pGraphics->Frame(m_pTimer->GetTime() / 1000);
 	if (!result)
 	{
 		return false;
