@@ -18,49 +18,10 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="AxisModel.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="ColorShader.cpp" />
-    <ClCompile Include="D3D.cpp" />
-    <ClCompile Include="EngineManager.cpp" />
-    <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="LightShader.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Timer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="AxisModel.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="ColorShader.h" />
-    <ClInclude Include="common.h" />
-    <ClInclude Include="D3D.h" />
-    <ClInclude Include="EngineManager.h" />
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="LightShader.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Timer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="color.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="light.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="cube.txt" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C7641F01-57F5-4D41-8A5E-8264A776A713}</ProjectGuid>
+    <ProjectGuid>{3FAE306B-1F38-4096-B0D6-DF5A95645527}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DX11_03</RootNamespace>
+    <RootNamespace>DX11_Texture</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -186,6 +147,36 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ColorShader.cpp" />
+    <ClCompile Include="D3D.cpp" />
+    <ClCompile Include="EngineManager.cpp" />
+    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Texture.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ColorShader.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="D3D.h" />
+    <ClInclude Include="EngineManager.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="color.ps">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="color.vs">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

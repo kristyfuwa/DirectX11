@@ -10,7 +10,7 @@
 #include<dxgi.h>
 #include<d3dcommon.h>
 #include<d3d11.h>
-//#include <xnamath.h>
+#include <xnamath.h>
 #include "common.h"
 
 #include <D3DX10math.h>
